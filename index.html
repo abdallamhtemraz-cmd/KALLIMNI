@@ -3748,7 +3748,7 @@ async function loadConversations(){
             await supabaseClient
                 .from("messages")
                 .select(
-                    "content,type,created_at"
+                    "text,message_type,created_at"
                 )
                 .eq(
                     "conversation_id",
@@ -3769,14 +3769,14 @@ async function loadConversations(){
         if(last){
 
             if(
-                last.type === "image"
+                last.message_type === "image"
             ){
 
                 lastMessage =
                     "🖼 صورة";
 
             }else if(
-                last.type === "voice"
+                last.message_type === "voice"
             ){
 
                 lastMessage =
@@ -3785,7 +3785,7 @@ async function loadConversations(){
             }else{
 
                 lastMessage =
-                    last.content || "";
+                    last.text || "";
             }
         }
 
@@ -4867,13 +4867,13 @@ function renderMessage(
 
 
     if(
-        message.type ===
+        message.message_type ===
         "image"
     ){
 
         const url =
             message.file_url ||
-            message.content ||
+            message.text ||
             "";
 
 
@@ -4903,7 +4903,7 @@ function renderMessage(
         `;
 
     }else if(
-        message.type ===
+        message.message_type ===
         "voice"
     ){
 
@@ -4915,7 +4915,7 @@ function renderMessage(
                 preload="metadata"
                 src="${escapeHTML(
                     message.file_url ||
-                    message.content ||
+                    message.text ||
                     ""
                 )}"
             ></audio>
@@ -4926,7 +4926,7 @@ function renderMessage(
 
         contentHTML =
             escapeHTML(
-                message.content ||
+                message.text ||
                 ""
             )
             .replace(
@@ -4937,7 +4937,7 @@ function renderMessage(
 
 
     const edited =
-        message.edited_at
+        message.edited
             ? `
                 <span class="message-edited">
                     تم التعديل
@@ -4970,7 +4970,7 @@ function renderMessage(
                 <div class="message-menu">
 
                     ${
-                        message.type ===
+                        message.message_type ===
                         "text"
 
                             ? `
@@ -5208,7 +5208,7 @@ async function editMessage(
     const newText =
         prompt(
             "اكتب الرسالة الجديدة:",
-            message.content || ""
+            message.text || ""
         );
 
 
@@ -5230,10 +5230,13 @@ async function editMessage(
                 .from("messages")
                 .update({
 
-                    content:
+                    text:
                         newText.trim(),
 
-                    edited_at:
+                    edited:
+                        true,
+
+                    updated_at:
                         new Date()
                             .toISOString()
                 })
@@ -5438,9 +5441,10 @@ async function sendText(){
                     sender_id:
                         currentUser.id,
 
-                    content,
+                    text:
+                        content,
 
-                    type:
+                    message_type:
                         "text"
                 })
                 .select()
@@ -5636,13 +5640,13 @@ $("imageInput").addEventListener(
                         sender_id:
                             currentUser.id,
 
-                        content:
+                        text:
                             urlData.publicUrl,
 
                         file_url:
                             urlData.publicUrl,
 
-                        type:
+                        message_type:
                             "image"
                     })
                     .select()
@@ -5924,13 +5928,13 @@ async function uploadVoice(
                     sender_id:
                         currentUser.id,
 
-                    content:
+                    text:
                         urlData.publicUrl,
 
                     file_url:
                         urlData.publicUrl,
 
-                    type:
+                    message_type:
                         "voice"
                 })
                 .select()
@@ -6081,7 +6085,7 @@ function updateRealtimeMessage(
 
 
     if(
-        message.type ===
+        message.message_type ===
         "text"
     ){
 
@@ -6095,7 +6099,7 @@ function updateRealtimeMessage(
 
             bubble.innerHTML =
                 escapeHTML(
-                    message.content ||
+                    message.text ||
                     ""
                 )
                 .replace(
