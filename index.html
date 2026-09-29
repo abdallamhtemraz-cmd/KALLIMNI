@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1.0"
+>
 
 <title>كلّمني | Kallimni</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 *{
     box-sizing:border-box;
     margin:0;
@@ -16,28 +23,40 @@
 }
 
 :root{
-    --bg:#080a0d;
-    --panel:#0e1116;
-    --panel2:#151922;
-    --panel3:#1b2029;
-    --border:rgba(255,255,255,.08);
-    --text:#f5f7fa;
-    --muted:#9299a6;
+
+    --bg:#07090c;
+    --panel:#0d1015;
+    --panel2:#13171e;
+    --panel3:#1a1f27;
+
+    --border:rgba(255,255,255,.075);
+
+    --text:#f7f8fa;
+    --muted:#8e96a4;
+
     --white:#fff;
     --black:#090b0e;
+
     --danger:#ef4444;
     --success:#22c55e;
-    --accent:#fff;
-    --shadow:0 20px 60px rgba(0,0,0,.4);
+
+    --shadow:
+        0 25px 80px rgba(0,0,0,.48);
+
+    --radius:18px;
 }
 
-html,body{
+html,
+body{
+
     width:100%;
     height:100%;
+
     overflow:hidden;
 }
 
 body{
+
     font-family:
         Inter,
         system-ui,
@@ -46,973 +65,1813 @@ body{
         "Segoe UI",
         Arial,
         sans-serif;
+
     background:
-        radial-gradient(circle at 20% 20%,rgba(255,255,255,.035),transparent 25%),
-        radial-gradient(circle at 80% 80%,rgba(255,255,255,.025),transparent 25%),
+        radial-gradient(
+            circle at 10% 10%,
+            rgba(255,255,255,.045),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 90% 90%,
+            rgba(255,255,255,.025),
+            transparent 28%
+        ),
         var(--bg);
+
     color:var(--text);
 }
 
 button,
 input,
 textarea{
+
     font:inherit;
 }
 
 button{
+
     cursor:pointer;
 }
 
 .hidden{
+
     display:none !important;
 }
 
-/* =========================
+/* =====================================================
    AUTH
-========================= */
+===================================================== */
 
 .auth-screen{
+
     width:100%;
     height:100%;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
     padding:20px;
 }
 
 .auth-box{
+
     width:100%;
-    max-width:430px;
-    background:rgba(14,17,22,.94);
+    max-width:440px;
+
+    padding:35px;
+
     border:1px solid var(--border);
-    border-radius:28px;
-    padding:34px;
+    border-radius:30px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(20,24,31,.97),
+            rgba(10,13,18,.97)
+        );
+
     box-shadow:var(--shadow);
-    backdrop-filter:blur(20px);
+
+    backdrop-filter:blur(25px);
 }
 
 .logo{
+
     text-align:center;
+
     margin-bottom:28px;
 }
 
 .logo-mark{
-    width:70px;
-    height:70px;
-    border-radius:22px;
-    background:#fff;
-    color:#080a0d;
+
+    width:74px;
+    height:74px;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
     margin:0 auto 15px;
-    font-size:30px;
-    font-weight:900;
-    box-shadow:0 12px 40px rgba(255,255,255,.12);
+
+    border-radius:23px;
+
+    background:#fff;
+    color:#080a0d;
+
+    font-size:31px;
+    font-weight:950;
+
+    box-shadow:
+        0 15px 45px rgba(255,255,255,.13);
 }
 
 .logo h1{
-    font-size:28px;
-    font-weight:900;
+
+    font-size:29px;
+    font-weight:950;
+
     letter-spacing:-1px;
 }
 
 .logo p{
-    color:var(--muted);
+
     margin-top:7px;
-    font-size:14px;
+
+    color:var(--muted);
+
+    font-size:13px;
 }
 
 .auth-tabs{
+
     display:grid;
     grid-template-columns:1fr 1fr;
+
     gap:5px;
+
     padding:5px;
-    background:var(--panel2);
-    border-radius:13px;
+
     margin-bottom:23px;
+
+    background:#0a0d11;
+
+    border:1px solid var(--border);
+
+    border-radius:14px;
 }
 
 .auth-tab{
+
+    height:40px;
+
     border:0;
-    color:var(--muted);
+    border-radius:10px;
+
     background:transparent;
-    padding:11px;
-    border-radius:9px;
+
+    color:var(--muted);
+
+    transition:.2s;
 }
 
 .auth-tab.active{
-    color:#111;
+
     background:#fff;
-    font-weight:800;
+
+    color:#0b0d10;
+
+    font-weight:900;
 }
 
 .auth-form{
+
     display:flex;
     flex-direction:column;
+
     gap:14px;
 }
 
-.field{
-    position:relative;
-}
-
 .field label{
+
     display:block;
-    font-size:13px;
-    color:#b7bdc7;
+
     margin-bottom:7px;
+
+    color:#b7bec9;
+
+    font-size:12px;
 }
 
 .field input{
+
     width:100%;
-    height:49px;
-    background:#0a0d11;
+    height:50px;
+
     border:1px solid var(--border);
     outline:none;
+
+    border-radius:14px;
+
+    background:#090c10;
     color:#fff;
-    border-radius:13px;
+
     padding:0 15px;
+
     transition:.2s;
 }
 
 .field input:focus{
-    border-color:rgba(255,255,255,.3);
-    background:#0c0f14;
+
+    border-color:rgba(255,255,255,.28);
+
+    background:#0c1015;
+
+    box-shadow:
+        0 0 0 3px rgba(255,255,255,.025);
 }
 
 .password-wrap{
+
     position:relative;
 }
 
 .password-wrap input{
-    padding-left:50px;
+
+    padding-left:52px;
 }
 
 .password-toggle{
+
     position:absolute;
+
     left:7px;
     top:7px;
-    width:35px;
-    height:35px;
+
+    width:36px;
+    height:36px;
+
     border:0;
     border-radius:9px;
-    color:#9ba1ad;
+
+    color:#a0a7b3;
+
     background:transparent;
 }
 
 .avatar-upload{
-    border:1px dashed rgba(255,255,255,.16);
-    border-radius:15px;
-    padding:15px;
+
     display:flex;
     align-items:center;
+
     gap:13px;
+
+    padding:14px;
+
+    border:1px dashed rgba(255,255,255,.14);
+    border-radius:15px;
+
+    background:#090c10;
+
     cursor:pointer;
-    background:#0a0d11;
+
+    transition:.2s;
+}
+
+.avatar-upload:hover{
+
+    border-color:rgba(255,255,255,.28);
+    background:#0c1015;
 }
 
 .avatar-preview{
+
     width:54px;
     height:54px;
+
     border-radius:50%;
+
     object-fit:cover;
+
     background:#191e26;
+
     display:none;
 }
 
 .avatar-placeholder{
+
     width:54px;
     height:54px;
+
     border-radius:50%;
+
     background:#1b2028;
+
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:23px;
+
+    font-size:22px;
 }
 
 .avatar-info strong{
+
     display:block;
-    font-size:14px;
+
+    font-size:13px;
 }
 
 .avatar-info span{
+
     display:block;
+
     color:var(--muted);
-    font-size:12px;
-    margin-top:3px;
+
+    font-size:11px;
+
+    margin-top:4px;
 }
 
 .main-btn{
+
     width:100%;
     height:50px;
+
     border:0;
-    border-radius:13px;
+    border-radius:14px;
+
     background:#fff;
     color:#080a0d;
-    font-weight:900;
+
+    font-weight:950;
+
     transition:.2s;
 }
 
 .main-btn:hover{
+
     transform:translateY(-1px);
 }
 
 .main-btn:disabled{
+
     opacity:.5;
+
     cursor:not-allowed;
+
     transform:none;
 }
 
 .auth-message{
+
     min-height:20px;
-    font-size:13px;
+
     text-align:center;
-    margin-top:2px;
+
+    font-size:12px;
 }
 
 .auth-message.error{
-    color:#ff7070;
+
+    color:#ff7777;
 }
 
 .auth-message.success{
+
     color:#4ade80;
 }
 
 .auth-note{
-    color:#747b87;
-    font-size:11px;
-    text-align:center;
+
     margin-top:18px;
-    line-height:1.7;
+
+    color:#727a87;
+
+    font-size:10px;
+
+    line-height:1.8;
+
+    text-align:center;
 }
 
-/* =========================
+/* =====================================================
    APP
-========================= */
+===================================================== */
 
 .app{
+
     width:100%;
     height:100%;
+
     display:grid;
-    grid-template-columns:360px 1fr;
+
+    grid-template-columns:370px 1fr;
+
     direction:ltr;
 }
 
 .sidebar{
+
     direction:rtl;
-    border-left:1px solid var(--border);
-    background:rgba(14,17,22,.96);
+
+    min-width:0;
+
     display:flex;
     flex-direction:column;
-    min-width:0;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(14,17,22,.98),
+            rgba(9,12,16,.98)
+        );
+
+    border-left:1px solid var(--border);
 }
 
 .sidebar-header{
-    padding:20px;
+
+    padding:18px;
+
     border-bottom:1px solid var(--border);
 }
 
 .profile-mini{
+
     display:flex;
     align-items:center;
     justify-content:space-between;
+
     gap:10px;
 }
 
 .profile-mini-info{
+
+    min-width:0;
+
     display:flex;
     align-items:center;
+
     gap:11px;
-    min-width:0;
 }
 
 .profile-mini img{
-    width:46px;
-    height:46px;
-    border-radius:50%;
+
+    width:47px;
+    height:47px;
+
     object-fit:cover;
+
+    border-radius:50%;
+
     background:#20242d;
+
+    border:1px solid rgba(255,255,255,.08);
 }
 
 .profile-mini-text{
+
     min-width:0;
 }
 
 .profile-mini-text strong{
+
     display:block;
+
+    max-width:210px;
+
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
+
+    font-size:14px;
 }
 
 .profile-mini-text span{
+
     display:block;
+
+    margin-top:4px;
+
     color:var(--muted);
-    font-size:11px;
-    margin-top:3px;
+
+    font-size:10px;
 }
 
 .icon-btn{
-    width:39px;
-    height:39px;
-    border:1px solid var(--border);
-    border-radius:11px;
-    background:#151922;
-    color:#fff;
+
+    width:40px;
+    height:40px;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
+    border:1px solid var(--border);
+    border-radius:12px;
+
+    background:#151922;
+    color:#fff;
+
+    transition:.2s;
+}
+
+.icon-btn:hover{
+
+    background:#1b2029;
+
+    border-color:rgba(255,255,255,.15);
+}
+
+.new-chat-area{
+
+    padding:15px 17px 10px;
+}
+
+.new-chat-btn{
+
+    width:100%;
+    min-height:70px;
+
+    display:flex;
+    align-items:center;
+
+    gap:12px;
+
+    padding:11px 12px;
+
+    border:1px solid rgba(255,255,255,.09);
+
+    border-radius:17px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.09),
+            rgba(255,255,255,.025)
+        );
+
+    color:#fff;
+
+    text-align:right;
+
+    transition:.2s;
+}
+
+.new-chat-btn:hover{
+
+    transform:translateY(-2px);
+
+    border-color:rgba(255,255,255,.18);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,255,255,.13),
+            rgba(255,255,255,.035)
+        );
+}
+
+.new-chat-icon{
+
+    width:44px;
+    height:44px;
+
+    flex-shrink:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:13px;
+
+    background:#fff;
+    color:#080a0d;
+
+    font-size:26px;
+    font-weight:500;
+}
+
+.new-chat-text{
+
+    min-width:0;
+}
+
+.new-chat-text strong{
+
+    display:block;
+
+    font-size:14px;
+    font-weight:950;
+}
+
+.new-chat-text small{
+
+    display:block;
+
+    margin-top:4px;
+
+    color:#8b93a0;
+
+    font-size:10px;
+}
+
+.new-chat-arrow{
+
+    margin-right:auto;
+
+    color:#727a87;
+
+    font-size:18px;
+
+    transition:.2s;
+}
+
+.new-chat-btn:hover .new-chat-arrow{
+
+    transform:translateX(-3px);
+
+    color:#fff;
 }
 
 .search-box{
-    padding:15px 20px;
+
+    padding:4px 17px 13px;
 }
 
 .search-box input{
+
     width:100%;
-    height:43px;
+    height:40px;
+
     border:1px solid var(--border);
+
+    outline:none;
+
+    border-radius:12px;
+
+    padding:0 13px;
+
     background:#090c10;
     color:#fff;
-    outline:none;
-    border-radius:12px;
-    padding:0 14px;
+
+    font-size:12px;
+}
+
+.search-box input:focus{
+
+    border-color:rgba(255,255,255,.18);
 }
 
 .conversations{
+
     flex:1;
+
     overflow-y:auto;
 }
 
 .empty-list{
+
     padding:35px 20px;
+
     text-align:center;
+
     color:var(--muted);
-    font-size:13px;
-    line-height:1.8;
+
+    font-size:12px;
+
+    line-height:1.9;
 }
 
 .conversation-item{
-    padding:13px 18px;
+
+    padding:13px 17px;
+
     display:flex;
     align-items:center;
+
     gap:12px;
+
     border-bottom:1px solid rgba(255,255,255,.035);
+
     cursor:pointer;
+
     transition:.15s;
 }
 
 .conversation-item:hover{
+
     background:rgba(255,255,255,.035);
 }
 
 .conversation-item.active{
-    background:rgba(255,255,255,.065);
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.02),
+            rgba(255,255,255,.065)
+        );
 }
 
 .conversation-item img{
+
     width:49px;
     height:49px;
-    object-fit:cover;
-    border-radius:50%;
+
     flex-shrink:0;
+
+    object-fit:cover;
+
+    border-radius:50%;
 }
 
 .conv-content{
-    min-width:0;
+
     flex:1;
+
+    min-width:0;
 }
 
 .conv-top{
+
     display:flex;
     align-items:center;
     justify-content:space-between;
+
     gap:8px;
 }
 
 .conv-name{
-    font-weight:800;
-    font-size:14px;
+
+    font-weight:850;
+
+    font-size:13px;
+
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
 }
 
 .conv-time{
-    color:#777e8b;
-    font-size:10px;
+
+    color:#777f8c;
+
+    font-size:9px;
+
     white-space:nowrap;
 }
 
 .conv-last{
+
+    margin-top:5px;
+
     color:var(--muted);
-    font-size:12px;
+
+    font-size:11px;
+
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
-    margin-top:5px;
 }
 
-/* =========================
+/* =====================================================
    CHAT
-========================= */
+===================================================== */
 
 .chat{
+
     direction:rtl;
+
     min-width:0;
+
     display:flex;
     flex-direction:column;
+
     background:
-        radial-gradient(circle at center,rgba(255,255,255,.018),transparent 45%),
+        radial-gradient(
+            circle at center,
+            rgba(255,255,255,.018),
+            transparent 45%
+        ),
         #090c10;
 }
 
 .chat-empty{
+
     flex:1;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
+    padding:30px;
+
     text-align:center;
+
     color:var(--muted);
 }
 
 .chat-empty-inner{
-    max-width:350px;
+
+    max-width:380px;
 }
 
 .chat-empty-icon{
-    width:70px;
-    height:70px;
-    margin:0 auto 17px;
-    border-radius:22px;
-    background:#151922;
+
+    width:76px;
+    height:76px;
+
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:28px;
+
+    margin:0 auto 18px;
+
+    border-radius:24px;
+
+    background:#151922;
+
+    border:1px solid var(--border);
+
+    font-size:30px;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.25);
 }
 
 .chat-empty h2{
+
     color:#fff;
-    font-size:20px;
+
+    font-size:21px;
+
     margin-bottom:7px;
 }
 
+.chat-empty p{
+
+    font-size:12px;
+
+    line-height:1.9;
+}
+
 .chat-header{
+
     height:76px;
+
+    flex-shrink:0;
+
     padding:10px 18px;
+
     display:flex;
     align-items:center;
     justify-content:space-between;
+
     gap:10px;
+
     border-bottom:1px solid var(--border);
+
     background:rgba(12,15,20,.9);
-    backdrop-filter:blur(16px);
+
+    backdrop-filter:blur(18px);
 }
 
 .chat-user{
+
+    min-width:0;
+
     display:flex;
     align-items:center;
-    gap:11px;
-    min-width:0;
+
+    gap:10px;
 }
 
 .chat-user img{
+
     width:46px;
     height:46px;
+
     object-fit:cover;
+
     border-radius:50%;
 }
 
 .chat-user-info{
+
     min-width:0;
 }
 
 .chat-user-info strong{
+
     display:block;
+
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
+
+    font-size:14px;
 }
 
 .chat-user-info span{
+
     display:block;
-    color:var(--muted);
-    font-size:11px;
+
     margin-top:3px;
+
+    color:var(--muted);
+
+    font-size:10px;
 }
 
 .chat-actions{
+
     display:flex;
+
     gap:7px;
 }
 
 .chat-actions button{
+
     width:38px;
     height:38px;
-    border-radius:10px;
+
     border:1px solid var(--border);
+    border-radius:10px;
+
     background:#151922;
+
     color:#fff;
+
+    transition:.2s;
+}
+
+.chat-actions button:hover{
+
+    background:#1c222b;
 }
 
 .chat-actions .danger{
+
     color:#ff7373;
 }
 
 .messages{
+
     flex:1;
+
     overflow-y:auto;
+
     padding:22px 5%;
+
     display:flex;
     flex-direction:column;
+
     gap:7px;
 }
 
 .date-divider{
-    text-align:center;
+
     margin:8px auto 12px;
-    color:#777f8c;
-    font-size:10px;
-    background:#12161d;
+
     padding:6px 11px;
+
     border-radius:20px;
+
+    background:#12161d;
+
+    color:#777f8c;
+
+    font-size:9px;
+
+    text-align:center;
 }
 
 .message-row{
+
     width:100%;
+
     display:flex;
 }
 
 .message-row.mine{
+
     justify-content:flex-start;
 }
 
 .message-row.theirs{
+
     justify-content:flex-end;
 }
 
 .message{
+
     max-width:min(70%,520px);
+
     position:relative;
 }
 
 .bubble{
-    border-radius:17px;
-    padding:9px 12px;
-    line-height:1.6;
-    word-break:break-word;
+
     position:relative;
+
+    padding:9px 12px;
+
+    border-radius:17px;
+
+    line-height:1.65;
+
+    word-break:break-word;
 }
 
 .mine .bubble{
+
     background:#fff;
     color:#090b0e;
+
     border-bottom-left-radius:5px;
 }
 
 .theirs .bubble{
+
     background:#171b22;
     color:#fff;
+
     border-bottom-right-radius:5px;
 }
 
 .message-meta{
-    font-size:9px;
-    margin-top:4px;
-    opacity:.55;
+
     display:flex;
     align-items:center;
+
     gap:5px;
+
+    margin-top:4px;
+
+    opacity:.55;
+
+    font-size:9px;
 }
 
 .mine .message-meta{
+
     justify-content:flex-start;
 }
 
 .theirs .message-meta{
+
     justify-content:flex-end;
 }
 
 .message-edited{
+
     opacity:.55;
 }
 
 .message-image{
+
+    display:block;
+
     max-width:300px;
     max-height:400px;
-    border-radius:13px;
-    display:block;
+
     object-fit:cover;
+
+    border-radius:13px;
+
     cursor:pointer;
 }
 
 .image-download{
-    margin-top:6px;
+
     display:inline-flex;
     align-items:center;
+
     gap:5px;
+
+    margin-top:6px;
+
     padding:6px 9px;
+
     border-radius:8px;
+
+    font-size:10px;
+
     text-decoration:none;
-    font-size:11px;
 }
 
 .mine .image-download{
+
     color:#111;
+
     background:#eee;
 }
 
 .theirs .image-download{
+
     color:#fff;
+
     background:#242a34;
 }
 
 .voice-player{
+
     width:240px;
+
     max-width:100%;
 }
 
 .message-menu{
+
     position:absolute;
+
     z-index:10;
-    min-width:130px;
-    background:#161a21;
-    border:1px solid var(--border);
-    border-radius:12px;
-    box-shadow:var(--shadow);
+
+    min-width:135px;
+
     padding:5px;
+
+    border:1px solid var(--border);
+
+    border-radius:12px;
+
+    background:#161a21;
+
+    box-shadow:var(--shadow);
+
     display:none;
 }
 
 .message-menu button{
+
     display:block;
+
     width:100%;
+
     border:0;
-    background:transparent;
-    color:#fff;
-    padding:9px 10px;
+
     border-radius:8px;
+
+    padding:9px 10px;
+
+    background:transparent;
+
+    color:#fff;
+
     text-align:right;
-    font-size:12px;
+
+    font-size:11px;
 }
 
 .message-menu button:hover{
+
     background:#242a33;
 }
 
 .composer-wrap{
+
+    flex-shrink:0;
+
     padding:12px 18px 16px;
+
     border-top:1px solid var(--border);
-    background:rgba(12,15,20,.95);
+
+    background:rgba(12,15,20,.96);
 }
 
 .blocked-banner{
-    background:rgba(239,68,68,.08);
-    border:1px solid rgba(239,68,68,.15);
-    color:#ff8c8c;
-    border-radius:11px;
-    padding:10px 13px;
-    font-size:12px;
+
     margin-bottom:9px;
+
+    padding:10px 13px;
+
+    border:1px solid rgba(239,68,68,.15);
+
+    border-radius:11px;
+
+    background:rgba(239,68,68,.08);
+
+    color:#ff8c8c;
+
+    font-size:11px;
+
     text-align:center;
 }
 
 .composer{
+
     display:flex;
     align-items:flex-end;
+
     gap:7px;
 }
 
 .composer textarea{
+
     flex:1;
+
     min-height:44px;
     max-height:120px;
+
     resize:none;
+
     outline:none;
+
     border:1px solid var(--border);
+
     border-radius:13px;
+
     padding:11px 13px;
+
     background:#090c10;
     color:#fff;
+
+    transition:.2s;
+}
+
+.composer textarea:focus{
+
+    border-color:rgba(255,255,255,.18);
 }
 
 .composer button{
+
     width:44px;
     height:44px;
-    border-radius:12px;
-    border:1px solid var(--border);
-    background:#151922;
-    color:#fff;
+
     flex-shrink:0;
+
+    border:1px solid var(--border);
+
+    border-radius:12px;
+
+    background:#151922;
+
+    color:#fff;
 }
 
 .composer .send-btn{
-    background:#fff;
-    color:#080a0d;
+
     border-color:#fff;
+
+    background:#fff;
+
+    color:#080a0d;
 }
 
-/* =========================
+/* =====================================================
    MODALS
-========================= */
+===================================================== */
 
 .modal{
+
     position:fixed;
     inset:0;
+
     z-index:1000;
-    background:rgba(0,0,0,.65);
-    backdrop-filter:blur(7px);
+
     display:flex;
     align-items:center;
     justify-content:center;
+
     padding:20px;
+
+    background:rgba(0,0,0,.68);
+
+    backdrop-filter:blur(8px);
 }
 
 .modal-box{
+
     width:100%;
     max-width:430px;
+
     max-height:90vh;
+
     overflow-y:auto;
-    background:#11151c;
-    border:1px solid var(--border);
-    border-radius:22px;
-    box-shadow:var(--shadow);
+
     padding:22px;
+
+    border:1px solid var(--border);
+
+    border-radius:23px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #151920,
+            #0f1319
+        );
+
+    box-shadow:var(--shadow);
 }
 
 .modal-header{
+
     display:flex;
     align-items:center;
     justify-content:space-between;
+
+    gap:10px;
+
     margin-bottom:18px;
 }
 
 .modal-header h3{
+
     font-size:18px;
 }
 
+.modal-subtitle{
+
+    margin-top:5px;
+
+    color:#858d9a;
+
+    font-size:10px;
+}
+
 .close-btn{
-    width:35px;
-    height:35px;
-    border-radius:9px;
+
+    width:36px;
+    height:36px;
+
     border:1px solid var(--border);
+
+    border-radius:10px;
+
     background:#181d25;
+
     color:#fff;
+
+    font-size:18px;
 }
 
 .modal-form{
+
     display:flex;
     flex-direction:column;
+
     gap:13px;
+}
+
+.modal-form label{
+
+    display:block;
+
+    margin-bottom:6px;
+
+    color:#aeb5c0;
+
+    font-size:11px;
 }
 
 .modal-form input,
 .modal-form textarea{
+
     width:100%;
+
     border:1px solid var(--border);
+
+    outline:none;
+
+    border-radius:12px;
+
+    padding:11px 12px;
+
     background:#090c10;
     color:#fff;
-    border-radius:11px;
-    padding:11px 12px;
-    outline:none;
+}
+
+.modal-form input:focus,
+.modal-form textarea:focus{
+
+    border-color:rgba(255,255,255,.2);
 }
 
 .modal-form textarea{
-    resize:vertical;
+
     min-height:90px;
+
+    resize:vertical;
 }
 
 .modal-actions{
+
     display:flex;
+
     gap:8px;
+
     margin-top:5px;
 }
 
 .modal-actions button{
+
     flex:1;
+
     height:43px;
+
     border:0;
+
     border-radius:11px;
 }
 
 .btn-light{
+
     background:#fff;
     color:#090b0e;
-    font-weight:800;
+
+    font-weight:900;
 }
 
 .btn-dark{
+
+    border:1px solid var(--border) !important;
+
     background:#1a1f27;
     color:#fff;
-    border:1px solid var(--border) !important;
 }
 
 .btn-danger{
+
     background:#3a1719;
     color:#ff8d8d;
 }
 
 .profile-big{
-    text-align:center;
+
     margin-bottom:20px;
+
+    text-align:center;
 }
 
 .profile-big img{
+
     width:85px;
     height:85px;
-    border-radius:50%;
-    object-fit:cover;
+
     margin-bottom:10px;
+
+    object-fit:cover;
+
+    border-radius:50%;
 }
 
 .profile-number{
+
     color:var(--muted);
-    font-size:12px;
+
+    font-size:11px;
 }
 
-/* =========================
+/* =====================================================
+   NEW CHAT MODAL
+===================================================== */
+
+.new-chat-modal{
+
+    max-width:440px;
+}
+
+.new-chat-number{
+
+    display:flex;
+    align-items:center;
+
+    gap:9px;
+
+    margin-top:10px;
+
+    padding:7px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:15px;
+
+    background:#090c10;
+
+    transition:.2s;
+}
+
+.new-chat-number:focus-within{
+
+    border-color:rgba(255,255,255,.24);
+
+    box-shadow:
+        0 0 0 3px rgba(255,255,255,.025);
+}
+
+.number-icon{
+
+    width:43px;
+    height:43px;
+
+    flex-shrink:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:11px;
+
+    background:#181d25;
+
+    color:#fff;
+
+    font-size:19px;
+}
+
+.new-chat-number input{
+
+    flex:1;
+
+    width:100%;
+    height:43px;
+
+    border:0 !important;
+
+    outline:none;
+
+    background:transparent !important;
+
+    color:#fff;
+
+    padding:0 8px;
+
+    direction:ltr;
+
+    text-align:left;
+
+    font-size:16px;
+}
+
+.new-chat-message{
+
+    min-height:24px;
+
+    margin-top:10px;
+
+    color:#ff7777;
+
+    font-size:11px;
+
+    text-align:center;
+}
+
+.new-chat-submit{
+
+    width:100%;
+    height:48px;
+
+    margin-top:4px;
+
+    border:0;
+
+    border-radius:13px;
+
+    background:#fff;
+
+    color:#090b0e;
+
+    font-weight:950;
+
+    transition:.2s;
+}
+
+.new-chat-submit:hover{
+
+    transform:translateY(-1px);
+}
+
+.new-chat-submit:disabled{
+
+    opacity:.5;
+
+    cursor:not-allowed;
+
+    transform:none;
+}
+
+/* =====================================================
    TOAST
-========================= */
+===================================================== */
 
 .toast{
+
     position:fixed;
-    bottom:22px;
+
     right:22px;
+    bottom:22px;
+
     z-index:3000;
+
+    max-width:min(380px,calc(100vw - 40px));
+
+    padding:12px 16px;
+
+    border-radius:12px;
+
     background:#fff;
     color:#090b0e;
-    border-radius:12px;
-    padding:12px 16px;
-    font-size:13px;
-    font-weight:700;
+
+    font-size:12px;
+    font-weight:800;
+
     box-shadow:var(--shadow);
+
     transform:translateY(20px);
+
     opacity:0;
+
     pointer-events:none;
+
     transition:.25s;
 }
 
 .toast.show{
+
     transform:translateY(0);
+
     opacity:1;
 }
 
-/* =========================
+/* =====================================================
    MOBILE
-========================= */
+===================================================== */
 
 .mobile-back{
+
     display:none;
 }
 
 @media(max-width:800px){
 
     .app{
+
         grid-template-columns:1fr;
     }
 
     .sidebar{
+
         width:100%;
+
         border-left:0;
     }
 
     .chat{
+
         display:none;
     }
 
     .app.chat-open .sidebar{
+
         display:none;
     }
 
     .app.chat-open .chat{
+
         display:flex;
     }
 
     .mobile-back{
+
         display:flex !important;
     }
 
     .message{
+
         max-width:82%;
     }
 
     .messages{
+
         padding:18px 12px;
     }
 
     .auth-box{
+
         padding:25px 20px;
+
         border-radius:22px;
+    }
+
+    .new-chat-area{
+
+        padding:12px 14px 8px;
+    }
+
+    .search-box{
+
+        padding:4px 14px 12px;
+    }
+
+    .chat-header{
+
+        padding:10px 12px;
+    }
+
+    .composer-wrap{
+
+        padding:10px 10px 12px;
     }
 }
 
-/* =========================
+/* =====================================================
    LOADING
-========================= */
+===================================================== */
 
 .loading{
+
     position:fixed;
     inset:0;
+
     z-index:5000;
-    background:#080a0d;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
+    background:#080a0d;
 }
 
 .loader{
+
     width:40px;
     height:40px;
+
     border:3px solid #252a33;
+
     border-top-color:#fff;
+
     border-radius:50%;
+
     animation:spin .8s linear infinite;
 }
 
 @keyframes spin{
-    to{transform:rotate(360deg)}
+
+    to{
+        transform:rotate(360deg);
+    }
 }
+
 </style>
+
 </head>
 
 <body>
 
-<!-- =========================
+
+<!-- =====================================================
      LOADING
-========================= -->
+===================================================== -->
 
 <div id="loadingScreen" class="loading hidden">
+
     <div class="loader"></div>
+
 </div>
 
-<!-- =========================
+
+<!-- =====================================================
      AUTH
-========================= -->
+===================================================== -->
 
 <section id="authScreen" class="auth-screen">
 
     <div class="auth-box">
 
         <div class="logo">
-            <div class="logo-mark">ك</div>
-            <h1>كلّمني</h1>
-            <p>Kallimni — تواصل بشكل بسيط</p>
+
+            <div class="logo-mark">
+                ك
+            </div>
+
+            <h1>
+                كلّمني
+            </h1>
+
+            <p>
+                Kallimni — تواصل بشكل بسيط
+            </p>
+
         </div>
 
+
         <div class="auth-tabs">
-            <button id="loginTab" class="auth-tab active">دخول</button>
-            <button id="signupTab" class="auth-tab">حساب جديد</button>
+
+            <button
+                id="loginTab"
+                class="auth-tab active"
+            >
+                دخول
+            </button>
+
+            <button
+                id="signupTab"
+                class="auth-tab"
+            >
+                حساب جديد
+            </button>
+
         </div>
+
 
         <!-- LOGIN -->
 
-        <form id="loginForm" class="auth-form">
+        <form
+            id="loginForm"
+            class="auth-form"
+        >
 
             <div class="field">
-                <label>رقم كلّمني</label>
+
+                <label>
+                    رقم كلّمني
+                </label>
+
                 <input
                     id="loginNumber"
                     type="text"
@@ -1021,12 +1880,18 @@ button{
                     placeholder="مثال: 01012345678"
                     autocomplete="username"
                 >
+
             </div>
 
+
             <div class="field">
-                <label>كلمة المرور</label>
+
+                <label>
+                    كلمة المرور
+                </label>
 
                 <div class="password-wrap">
+
                     <input
                         id="loginPassword"
                         type="password"
@@ -1038,24 +1903,44 @@ button{
                         type="button"
                         class="password-toggle"
                         id="loginPasswordToggle"
-                    >◉</button>
+                    >
+                        ◉
+                    </button>
+
                 </div>
+
             </div>
 
-            <button id="loginBtn" class="main-btn" type="submit">
+
+            <button
+                id="loginBtn"
+                class="main-btn"
+                type="submit"
+            >
                 دخول للحساب
             </button>
 
-            <div id="loginMessage" class="auth-message"></div>
+
+            <div
+                id="loginMessage"
+                class="auth-message"
+            ></div>
 
         </form>
 
+
         <!-- SIGNUP -->
 
-        <form id="signupForm" class="auth-form hidden">
+        <form
+            id="signupForm"
+            class="auth-form hidden"
+        >
 
             <div class="field">
-                <label>اسمك</label>
+
+                <label>
+                    اسمك
+                </label>
 
                 <input
                     id="signupName"
@@ -1064,12 +1949,18 @@ button{
                     placeholder="اكتب اسمك"
                     autocomplete="name"
                 >
+
             </div>
 
+
             <div class="field">
-                <label>كلمة المرور</label>
+
+                <label>
+                    كلمة المرور
+                </label>
 
                 <div class="password-wrap">
+
                     <input
                         id="signupPassword"
                         type="password"
@@ -1082,24 +1973,46 @@ button{
                         type="button"
                         class="password-toggle"
                         id="signupPasswordToggle"
-                    >◉</button>
+                    >
+                        ◉
+                    </button>
+
                 </div>
+
             </div>
 
-            <label class="avatar-upload" for="signupAvatar">
 
-                <img id="signupAvatarPreview" class="avatar-preview">
+            <label
+                class="avatar-upload"
+                for="signupAvatar"
+            >
 
-                <div id="signupAvatarPlaceholder" class="avatar-placeholder">
+                <img
+                    id="signupAvatarPreview"
+                    class="avatar-preview"
+                >
+
+                <div
+                    id="signupAvatarPlaceholder"
+                    class="avatar-placeholder"
+                >
                     📷
                 </div>
 
                 <div class="avatar-info">
-                    <strong>صورة البروفايل</strong>
-                    <span>الصورة مطلوبة لإنشاء الحساب</span>
+
+                    <strong>
+                        صورة البروفايل
+                    </strong>
+
+                    <span>
+                        الصورة مطلوبة لإنشاء الحساب
+                    </span>
+
                 </div>
 
             </label>
+
 
             <input
                 id="signupAvatar"
@@ -1108,15 +2021,28 @@ button{
                 class="hidden"
             >
 
-            <button id="signupBtn" class="main-btn" type="submit">
+
+            <button
+                id="signupBtn"
+                class="main-btn"
+                type="submit"
+            >
                 إنشاء الحساب
             </button>
 
-            <div id="signupMessage" class="auth-message"></div>
+
+            <div
+                id="signupMessage"
+                class="auth-message"
+            ></div>
+
 
             <div class="auth-note">
+
                 سيتم إنشاء رقم كلّمني خاص بيك تلقائيًا.
-                الرقم هيكون 11 رقم ومش هيتغير حتى لو غيرت اسمك أو صورتك.
+                <br>
+                الرقم هيكون 11 رقم ومش هيتغير.
+
             </div>
 
         </form>
@@ -1125,15 +2051,21 @@ button{
 
 </section>
 
-<!-- =========================
-     APP
-========================= -->
 
-<section id="app" class="app hidden">
+<!-- =====================================================
+     APP
+===================================================== -->
+
+<section
+    id="app"
+    class="app hidden"
+>
+
 
     <!-- SIDEBAR -->
 
     <aside class="sidebar">
+
 
         <div class="sidebar-header">
 
@@ -1141,16 +2073,32 @@ button{
 
                 <div class="profile-mini-info">
 
-                    <img id="myAvatar" src="" alt="">
+                    <img
+                        id="myAvatar"
+                        src=""
+                        alt=""
+                    >
 
                     <div class="profile-mini-text">
-                        <strong id="myName">...</strong>
-                        <span id="myNumber">...</span>
+
+                        <strong id="myName">
+                            ...
+                        </strong>
+
+                        <span id="myNumber">
+                            ...
+                        </span>
+
                     </div>
 
                 </div>
 
-                <button id="settingsBtn" class="icon-btn">
+
+                <button
+                    id="settingsBtn"
+                    class="icon-btn"
+                    title="الإعدادات"
+                >
                     ⚙
                 </button>
 
@@ -1158,31 +2106,87 @@ button{
 
         </div>
 
+
+        <!-- NEW CHAT -->
+
+        <div class="new-chat-area">
+
+            <button
+                id="newChatBtn"
+                class="new-chat-btn"
+            >
+
+                <span class="new-chat-icon">
+                    ＋
+                </span>
+
+                <span class="new-chat-text">
+
+                    <strong>
+                        محادثة جديدة
+                    </strong>
+
+                    <small>
+                        ابدأ محادثة باستخدام رقم كلّمني
+                    </small>
+
+                </span>
+
+                <span class="new-chat-arrow">
+                    ←
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <!-- SEARCH -->
+
         <div class="search-box">
+
             <input
                 id="personSearch"
                 type="text"
                 inputmode="numeric"
                 maxlength="11"
-                placeholder="اكتب رقم كلّمني لبدء محادثة"
+                placeholder="بحث سريع برقم كلّمني..."
             >
+
         </div>
 
-        <div id="conversations" class="conversations">
+
+        <div
+            id="conversations"
+            class="conversations"
+        >
+
             <div class="empty-list">
+
                 لا توجد محادثات حتى الآن.
+
                 <br>
-                اكتب رقم كلّمني لبدء محادثة.
+
+                اضغط على
+                «محادثة جديدة»
+                للبدء.
+
             </div>
+
         </div>
 
     </aside>
+
 
     <!-- CHAT -->
 
     <main class="chat">
 
-        <div id="chatEmpty" class="chat-empty">
+
+        <div
+            id="chatEmpty"
+            class="chat-empty"
+        >
 
             <div class="chat-empty-inner">
 
@@ -1190,20 +2194,27 @@ button{
                     💬
                 </div>
 
-                <h2>كلّمني</h2>
+                <h2>
+                    كلّمني
+                </h2>
 
                 <p>
-                    اختار محادثة من القائمة أو اكتب رقم كلّمني
-                    لبدء محادثة جديدة.
+                    اختار محادثة من القائمة أو ابدأ محادثة جديدة باستخدام رقم كلّمني.
                 </p>
 
             </div>
 
         </div>
 
-        <div id="chatContent" class="hidden">
+
+        <div
+            id="chatContent"
+            class="hidden"
+        >
+
 
             <header class="chat-header">
+
 
                 <div class="chat-user">
 
@@ -1211,19 +2222,34 @@ button{
                         id="mobileBack"
                         class="icon-btn mobile-back"
                     >
-                        → 
+                        →
                     </button>
 
-                    <img id="chatAvatar" src="" alt="">
+
+                    <img
+                        id="chatAvatar"
+                        src=""
+                        alt=""
+                    >
+
 
                     <div class="chat-user-info">
-                        <strong id="chatName">...</strong>
-                        <span id="chatNumber">...</span>
+
+                        <strong id="chatName">
+                            ...
+                        </strong>
+
+                        <span id="chatNumber">
+                            ...
+                        </span>
+
                     </div>
 
                 </div>
 
+
                 <div class="chat-actions">
+
 
                     <button
                         id="blockBtn"
@@ -1233,6 +2259,7 @@ button{
                         🚫
                     </button>
 
+
                     <button
                         id="unblockBtn"
                         class="hidden"
@@ -1240,6 +2267,7 @@ button{
                     >
                         ↩️
                     </button>
+
 
                     <button
                         id="reportBtn"
@@ -1252,24 +2280,42 @@ button{
 
             </header>
 
-            <div id="messages" class="messages"></div>
+
+            <div
+                id="messages"
+                class="messages"
+            ></div>
+
 
             <div class="composer-wrap">
+
 
                 <div
                     id="blockedBanner"
                     class="blocked-banner hidden"
                 ></div>
 
-                <div id="composer" class="composer">
 
-                    <button id="imageBtn" title="صورة">
+                <div
+                    id="composer"
+                    class="composer"
+                >
+
+                    <button
+                        id="imageBtn"
+                        title="صورة"
+                    >
                         🖼
                     </button>
 
-                    <button id="voiceBtn" title="تسجيل صوت">
+
+                    <button
+                        id="voiceBtn"
+                        title="تسجيل صوت"
+                    >
                         🎙
                     </button>
+
 
                     <textarea
                         id="messageInput"
@@ -1277,6 +2323,7 @@ button{
                         maxlength="5000"
                         placeholder="اكتب رسالة..."
                     ></textarea>
+
 
                     <button
                         id="sendBtn"
@@ -1287,6 +2334,7 @@ button{
                     </button>
 
                 </div>
+
 
                 <input
                     id="imageInput"
@@ -1303,43 +2351,160 @@ button{
 
 </section>
 
-<!-- =========================
-     SETTINGS MODAL
-========================= -->
 
-<div id="settingsModal" class="modal hidden">
+<!-- =====================================================
+     NEW CHAT MODAL
+===================================================== -->
+
+<div
+    id="newChatModal"
+    class="modal hidden"
+>
+
+    <div class="modal-box new-chat-modal">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <h3>
+                    محادثة جديدة
+                </h3>
+
+                <p class="modal-subtitle">
+                    اكتب رقم كلّمني للشخص اللي عايز تكلمه
+                </p>
+
+            </div>
+
+
+            <button
+                id="closeNewChat"
+                class="close-btn"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="new-chat-number">
+
+            <div class="number-icon">
+                ☎
+            </div>
+
+
+            <input
+                id="newChatNumber"
+                type="text"
+                inputmode="numeric"
+                maxlength="11"
+                placeholder="01012345678"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <div
+            id="newChatMessage"
+            class="new-chat-message"
+        ></div>
+
+
+        <button
+            id="openNewChatBtn"
+            class="new-chat-submit"
+        >
+            فتح المحادثة
+            <span>←</span>
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     SETTINGS MODAL
+===================================================== -->
+
+<div
+    id="settingsModal"
+    class="modal hidden"
+>
 
     <div class="modal-box">
 
+
         <div class="modal-header">
-            <h3>الإعدادات</h3>
-            <button id="closeSettings" class="close-btn">×</button>
+
+            <h3>
+                الإعدادات
+            </h3>
+
+            <button
+                id="closeSettings"
+                class="close-btn"
+            >
+                ×
+            </button>
+
         </div>
+
 
         <div class="profile-big">
-            <img id="settingsAvatar" src="" alt="">
-            <div id="settingsNumber" class="profile-number"></div>
+
+            <img
+                id="settingsAvatar"
+                src=""
+                alt=""
+            >
+
+            <div
+                id="settingsNumber"
+                class="profile-number"
+            ></div>
+
         </div>
 
-        <form id="settingsForm" class="modal-form">
+
+        <form
+            id="settingsForm"
+            class="modal-form"
+        >
 
             <div>
-                <label>الاسم</label>
+
+                <label>
+                    الاسم
+                </label>
+
                 <input
                     id="settingsName"
                     type="text"
                     maxlength="40"
                 >
+
             </div>
 
+
             <div>
-                <label>تغيير الصورة</label>
+
+                <label>
+                    تغيير الصورة
+                </label>
+
                 <input
                     id="settingsAvatarInput"
                     type="file"
                     accept="image/*"
                 >
+
             </div>
+
 
             <div class="modal-actions">
 
@@ -1366,26 +2531,46 @@ button{
 
 </div>
 
-<!-- =========================
-     REPORT MODAL
-========================= -->
 
-<div id="reportModal" class="modal hidden">
+<!-- =====================================================
+     REPORT MODAL
+===================================================== -->
+
+<div
+    id="reportModal"
+    class="modal hidden"
+>
 
     <div class="modal-box">
 
+
         <div class="modal-header">
-            <h3>الإبلاغ عن الحساب</h3>
-            <button id="closeReport" class="close-btn">×</button>
+
+            <h3>
+                الإبلاغ عن الحساب
+            </h3>
+
+            <button
+                id="closeReport"
+                class="close-btn"
+            >
+                ×
+            </button>
+
         </div>
 
-        <form id="reportForm" class="modal-form">
+
+        <form
+            id="reportForm"
+            class="modal-form"
+        >
 
             <textarea
                 id="reportReason"
                 maxlength="1000"
                 placeholder="اكتب سبب الإبلاغ..."
             ></textarea>
+
 
             <div class="modal-actions">
 
@@ -1395,6 +2580,7 @@ button{
                 >
                     إرسال البلاغ
                 </button>
+
 
                 <button
                     type="button"
@@ -1412,13 +2598,19 @@ button{
 
 </div>
 
-<!-- =========================
-     TOAST
-========================= -->
 
-<div id="toast" class="toast"></div>
+<!-- =====================================================
+     TOAST
+===================================================== -->
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
 
 <script>
+
 /* =========================================================
    SUPABASE
 ========================================================= */
@@ -1459,7 +2651,6 @@ let recordingVoice = false;
 
 let selectedAvatarFile = null;
 
-const avatarCache = new Map();
 const profileCache = new Map();
 
 
@@ -1468,18 +2659,29 @@ const profileCache = new Map();
 ========================================================= */
 
 function $(id){
+
     return document.getElementById(id);
 }
 
+
 function show(el){
-    el.classList.remove("hidden");
+
+    if(el){
+        el.classList.remove("hidden");
+    }
 }
+
 
 function hide(el){
-    el.classList.add("hidden");
+
+    if(el){
+        el.classList.add("hidden");
+    }
 }
 
+
 function escapeHTML(value){
+
     return String(value ?? "")
         .replaceAll("&","&amp;")
         .replaceAll("<","&lt;")
@@ -1488,26 +2690,37 @@ function escapeHTML(value){
         .replaceAll("'","&#039;");
 }
 
+
 function normalizeNumber(value){
+
     return String(value || "")
         .replace(/\D/g,"")
         .slice(0,11);
 }
 
+
 function internalEmail(number){
+
     return `${number}@kallimni.app`;
 }
 
+
 function formatTime(date){
+
     const d = new Date(date);
 
-    return d.toLocaleTimeString("ar-EG",{
-        hour:"2-digit",
-        minute:"2-digit"
-    });
+    return d.toLocaleTimeString(
+        "ar-EG",
+        {
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
 }
 
+
 function formatConversationTime(date){
+
     const d = new Date(date);
     const now = new Date();
 
@@ -1516,44 +2729,72 @@ function formatConversationTime(date){
         d.getMonth() === now.getMonth() &&
         d.getFullYear() === now.getFullYear()
     ){
+
         return formatTime(d);
     }
 
-    return d.toLocaleDateString("ar-EG",{
-        day:"numeric",
-        month:"short"
-    });
+    return d.toLocaleDateString(
+        "ar-EG",
+        {
+            day:"numeric",
+            month:"short"
+        }
+    );
 }
 
+
 function showToast(message){
+
     const toast = $("toast");
 
     toast.textContent = message;
+
     toast.classList.add("show");
 
-    clearTimeout(showToast.timer);
+    clearTimeout(
+        showToast.timer
+    );
 
-    showToast.timer = setTimeout(()=>{
-        toast.classList.remove("show");
-    },2500);
+    showToast.timer =
+        setTimeout(
+            ()=>{
+                toast.classList.remove("show");
+            },
+            2800
+        );
 }
 
-function setAuthMessage(id,message,type=""){
+
+function setAuthMessage(
+    id,
+    message,
+    type=""
+){
+
     const el = $(id);
 
     el.textContent = message;
-    el.className = "auth-message " + type;
+
+    el.className =
+        "auth-message " + type;
 }
 
+
 function setLoading(value){
+
     if(value){
+
         show($("loadingScreen"));
+
     }else{
+
         hide($("loadingScreen"));
     }
 }
 
+
 function getAvatar(url){
+
     return url ||
         "https://ui-avatars.com/api/?name=K&background=1b2028&color=fff&size=200";
 }
@@ -1563,101 +2804,141 @@ function getAvatar(url){
    IMAGE COMPRESSION
 ========================================================= */
 
-function compressImage(file,maxSize=900,quality=.78){
+function compressImage(
+    file,
+    maxSize=900,
+    quality=.78
+){
 
-    return new Promise((resolve,reject)=>{
+    return new Promise(
+        (resolve,reject)=>{
 
-        const reader = new FileReader();
+            const reader =
+                new FileReader();
 
-        reader.onload = ()=>{
+            reader.onload = ()=>{
 
-            const img = new Image();
+                const img =
+                    new Image();
 
-            img.onload = ()=>{
+                img.onload = ()=>{
 
-                let width = img.width;
-                let height = img.height;
+                    let width =
+                        img.width;
 
-                if(width > maxSize || height > maxSize){
+                    let height =
+                        img.height;
 
-                    if(width > height){
+                    if(
+                        width > maxSize ||
+                        height > maxSize
+                    ){
 
-                        height =
-                            Math.round(
-                                height * maxSize / width
-                            );
+                        if(width > height){
 
-                        width = maxSize;
+                            height =
+                                Math.round(
+                                    height *
+                                    maxSize /
+                                    width
+                                );
 
-                    }else{
+                            width =
+                                maxSize;
 
-                        width =
-                            Math.round(
-                                width * maxSize / height
-                            );
+                        }else{
 
-                        height = maxSize;
-                    }
-                }
+                            width =
+                                Math.round(
+                                    width *
+                                    maxSize /
+                                    height
+                                );
 
-                const canvas =
-                    document.createElement("canvas");
-
-                canvas.width = width;
-                canvas.height = height;
-
-                const ctx =
-                    canvas.getContext("2d");
-
-                ctx.drawImage(
-                    img,
-                    0,
-                    0,
-                    width,
-                    height
-                );
-
-                canvas.toBlob(
-                    blob=>{
-                        if(!blob){
-                            reject(
-                                new Error(
-                                    "Image compression failed"
-                                )
-                            );
-                            return;
+                            height =
+                                maxSize;
                         }
+                    }
 
-                        const blobReader =
-                            new FileReader();
+                    const canvas =
+                        document.createElement(
+                            "canvas"
+                        );
 
-                        blobReader.onload = ()=>{
-                            resolve({
-                                base64:
-                                    blobReader.result
-                                    .split(",")[1],
-                                type:"image/jpeg"
-                            });
-                        };
+                    canvas.width =
+                        width;
 
-                        blobReader.onerror = reject;
+                    canvas.height =
+                        height;
 
-                        blobReader.readAsDataURL(blob);
-                    },
-                    "image/jpeg",
-                    quality
-                );
+                    const ctx =
+                        canvas.getContext(
+                            "2d"
+                        );
+
+                    ctx.drawImage(
+                        img,
+                        0,
+                        0,
+                        width,
+                        height
+                    );
+
+                    canvas.toBlob(
+                        blob=>{
+
+                            if(!blob){
+
+                                reject(
+                                    new Error(
+                                        "Image compression failed"
+                                    )
+                                );
+
+                                return;
+                            }
+
+                            const blobReader =
+                                new FileReader();
+
+                            blobReader.onload =
+                                ()=>{
+
+                                    resolve({
+
+                                        base64:
+                                            blobReader.result
+                                                .split(",")[1],
+
+                                        type:
+                                            "image/jpeg"
+                                    });
+                                };
+
+                            blobReader.onerror =
+                                reject;
+
+                            blobReader.readAsDataURL(
+                                blob
+                            );
+
+                        },
+                        "image/jpeg",
+                        quality
+                    );
+                };
+
+                img.onerror = reject;
+
+                img.src =
+                    reader.result;
             };
 
-            img.onerror = reject;
+            reader.onerror = reject;
 
-            img.src = reader.result;
-        };
-
-        reader.onerror = reject;
-
-        reader.readAsDataURL(file);
-    });
+            reader.readAsDataURL(file);
+        }
+    );
 }
 
 
@@ -1666,18 +2947,33 @@ function compressImage(file,maxSize=900,quality=.78){
 ========================================================= */
 
 $("loginTab").onclick = ()=>{
-    $("loginTab").classList.add("active");
-    $("signupTab").classList.remove("active");
+
+    $("loginTab")
+        .classList
+        .add("active");
+
+    $("signupTab")
+        .classList
+        .remove("active");
 
     show($("loginForm"));
+
     hide($("signupForm"));
 };
 
+
 $("signupTab").onclick = ()=>{
-    $("signupTab").classList.add("active");
-    $("loginTab").classList.remove("active");
+
+    $("signupTab")
+        .classList
+        .add("active");
+
+    $("loginTab")
+        .classList
+        .remove("active");
 
     show($("signupForm"));
+
     hide($("loginForm"));
 };
 
@@ -1687,7 +2983,9 @@ $("signupTab").onclick = ()=>{
 ========================================================= */
 
 function togglePassword(inputId){
-    const input = $(inputId);
+
+    const input =
+        $(inputId);
 
     input.type =
         input.type === "password"
@@ -1695,36 +2993,57 @@ function togglePassword(inputId){
             : "password";
 }
 
+
 $("loginPasswordToggle").onclick =
-    ()=>togglePassword("loginPassword");
+    ()=>{
+        togglePassword(
+            "loginPassword"
+        );
+    };
+
 
 $("signupPasswordToggle").onclick =
-    ()=>togglePassword("signupPassword");
+    ()=>{
+        togglePassword(
+            "signupPassword"
+        );
+    };
 
 
 /* =========================================================
    AVATAR PREVIEW
 ========================================================= */
 
-$("signupAvatar").addEventListener("change",event=>{
+$("signupAvatar").addEventListener(
+    "change",
+    event=>{
 
-    const file = event.target.files[0];
+        const file =
+            event.target.files[0];
 
-    if(!file){
-        return;
+        if(!file){
+            return;
+        }
+
+        selectedAvatarFile =
+            file;
+
+        const url =
+            URL.createObjectURL(file);
+
+        $("signupAvatarPreview").src =
+            url;
+
+        $("signupAvatarPreview")
+            .style
+            .display =
+                "block";
+
+        hide(
+            $("signupAvatarPlaceholder")
+        );
     }
-
-    selectedAvatarFile = file;
-
-    const url = URL.createObjectURL(file);
-
-    $("signupAvatarPreview").src = url;
-
-    $("signupAvatarPreview").style.display =
-        "block";
-
-    hide($("signupAvatarPlaceholder"));
-});
+);
 
 
 /* =========================================================
@@ -1738,10 +3057,13 @@ $("signupForm").addEventListener(
         event.preventDefault();
 
         const name =
-            $("signupName").value.trim();
+            $("signupName")
+                .value
+                .trim();
 
         const password =
-            $("signupPassword").value;
+            $("signupPassword")
+                .value;
 
         const avatarFile =
             selectedAvatarFile;
@@ -1784,10 +3106,13 @@ $("signupForm").addEventListener(
             return;
         }
 
-        const btn = $("signupBtn");
+        const btn =
+            $("signupBtn");
 
         btn.disabled = true;
-        btn.textContent = "جاري إنشاء الحساب...";
+
+        btn.textContent =
+            "جاري إنشاء الحساب...";
 
         try{
 
@@ -1797,12 +3122,6 @@ $("signupForm").addEventListener(
                     700,
                     .75
                 );
-
-            /*
-             * مهم:
-             * التسجيل يتم عن طريق Edge Function
-             * وليس auth.signUp من المتصفح.
-             */
 
             const {
                 data,
@@ -1826,26 +3145,28 @@ $("signupForm").addEventListener(
                 throw error;
             }
 
-            if(!data || !data.success){
+            if(
+                !data ||
+                !data.success
+            ){
+
                 throw new Error(
                     data?.message ||
                     "فشل إنشاء الحساب."
                 );
             }
 
-            /*
-             * بعد إنشاء الحساب:
-             * تسجيل دخول تلقائي.
-             */
-
             const loginResult =
-                await supabaseClient.auth.signInWithPassword({
-                    email:
-                        internalEmail(
-                            data.number
-                        ),
-                    password
-                });
+                await supabaseClient.auth
+                    .signInWithPassword({
+
+                        email:
+                            internalEmail(
+                                data.number
+                            ),
+
+                        password
+                    });
 
             if(loginResult.error){
                 throw loginResult.error;
@@ -1861,7 +3182,10 @@ $("signupForm").addEventListener(
 
         }catch(error){
 
-            console.error(error);
+            console.error(
+                "SIGNUP ERROR:",
+                error
+            );
 
             setAuthMessage(
                 "signupMessage",
@@ -1873,7 +3197,9 @@ $("signupForm").addEventListener(
         }finally{
 
             btn.disabled = false;
-            btn.textContent = "إنشاء الحساب";
+
+            btn.textContent =
+                "إنشاء الحساب";
         }
     }
 );
@@ -1889,7 +3215,7 @@ $("loginForm").addEventListener(
 
         event.preventDefault();
 
-        let number =
+        const number =
             normalizeNumber(
                 $("loginNumber").value
             );
@@ -1924,39 +3250,46 @@ $("loginForm").addEventListener(
             return;
         }
 
-        const btn = $("loginBtn");
+        const btn =
+            $("loginBtn");
 
         btn.disabled = true;
-        btn.textContent = "جاري الدخول...";
+
+        btn.textContent =
+            "جاري الدخول...";
 
         try{
-
-            /*
-             * الرقم هو المعرف الحقيقي للمستخدم.
-             * لا فرق بين أي حروف لأن الرقم فقط يستخدم هنا.
-             */
 
             const {
                 data,
                 error
             } =
-                await supabaseClient.auth.signInWithPassword({
-                    email:
-                        internalEmail(number),
-                    password
-                });
+                await supabaseClient.auth
+                    .signInWithPassword({
+
+                        email:
+                            internalEmail(
+                                number
+                            ),
+
+                        password
+                    });
 
             if(error){
                 throw error;
             }
 
-            currentUser = data.user;
+            currentUser =
+                data.user;
 
             await loadApp();
 
         }catch(error){
 
-            console.error(error);
+            console.error(
+                "LOGIN ERROR:",
+                error
+            );
 
             setAuthMessage(
                 "loginMessage",
@@ -1967,7 +3300,9 @@ $("loginForm").addEventListener(
         }finally{
 
             btn.disabled = false;
-            btn.textContent = "دخول للحساب";
+
+            btn.textContent =
+                "دخول للحساب";
         }
     }
 );
@@ -1990,14 +3325,18 @@ async function loadMyProfile(){
         await supabaseClient
             .from("profiles")
             .select("*")
-            .eq("id",currentUser.id)
+            .eq(
+                "id",
+                currentUser.id
+            )
             .single();
 
     if(error){
         throw error;
     }
 
-    currentProfile = data;
+    currentProfile =
+        data;
 
     profileCache.set(
         data.id,
@@ -2023,13 +3362,15 @@ async function loadApp(){
                 user
             }
         } =
-            await supabaseClient.auth.getUser();
+            await supabaseClient.auth
+                .getUser();
 
         if(!user){
             return;
         }
 
-        currentUser = user;
+        currentUser =
+            user;
 
         await loadMyProfile();
 
@@ -2045,6 +3386,7 @@ async function loadApp(){
             );
 
         hide($("authScreen"));
+
         show($("app"));
 
         await loadConversations();
@@ -2053,7 +3395,10 @@ async function loadApp(){
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            "LOAD APP ERROR:",
+            error
+        );
 
         showToast(
             "حصل خطأ أثناء تحميل الحساب."
@@ -2073,6 +3418,35 @@ async function loadApp(){
 $("logoutBtn").onclick =
     async ()=>{
 
+        try{
+
+            if(messageChannel){
+
+                await supabaseClient
+                    .removeChannel(
+                        messageChannel
+                    );
+
+                messageChannel =
+                    null;
+            }
+
+            if(conversationChannel){
+
+                await supabaseClient
+                    .removeChannel(
+                        conversationChannel
+                    );
+
+                conversationChannel =
+                    null;
+            }
+
+        }catch(error){
+
+            console.error(error);
+        }
+
         await supabaseClient.auth.signOut();
 
         currentUser = null;
@@ -2083,7 +3457,7 @@ $("logoutBtn").onclick =
 
 
 /* =========================================================
-   CONVERSATIONS
+   GET OTHER USER
 ========================================================= */
 
 async function getConversationOtherUser(
@@ -2117,7 +3491,12 @@ async function getConversationOtherUser(
             .maybeSingle();
 
     if(error){
-        console.error(error);
+
+        console.error(
+            "GET OTHER USER:",
+            error
+        );
+
         return null;
     }
 
@@ -2125,7 +3504,15 @@ async function getConversationOtherUser(
 }
 
 
+/* =========================================================
+   LOAD CONVERSATIONS
+========================================================= */
+
 async function loadConversations(){
+
+    if(!currentUser){
+        return;
+    }
 
     const container =
         $("conversations");
@@ -2147,40 +3534,73 @@ async function loadConversations(){
             .eq(
                 "user_id",
                 currentUser.id
-            )
-            .order(
-                "conversation_id",
-                {
-                    ascending:false
-                }
             );
 
     if(error){
-        console.error(error);
+
+        console.error(
+            "LOAD CONVERSATIONS:",
+            error
+        );
 
         container.innerHTML =
-            `<div class="empty-list">
+            `
+            <div class="empty-list">
                 حصل خطأ في تحميل المحادثات.
-            </div>`;
+            </div>
+            `;
 
         return;
     }
 
-    if(!data || data.length === 0){
+    if(
+        !data ||
+        data.length === 0
+    ){
 
         container.innerHTML =
-            `<div class="empty-list">
+            `
+            <div class="empty-list">
                 لا توجد محادثات حتى الآن.
                 <br>
-                اكتب رقم كلّمني لبدء محادثة.
-            </div>`;
+                اضغط على «محادثة جديدة» للبدء.
+            </div>
+            `;
 
         return;
     }
 
     container.innerHTML = "";
 
-    for(const item of data){
+    /*
+     * الأحدث أولًا
+     */
+
+    data.sort(
+        (a,b)=>{
+
+            const da =
+                new Date(
+                    a.conversations?.updated_at ||
+                    a.conversations?.created_at ||
+                    0
+                );
+
+            const db =
+                new Date(
+                    b.conversations?.updated_at ||
+                    b.conversations?.created_at ||
+                    0
+                );
+
+            return db - da;
+        }
+    );
+
+
+    for(
+        const item of data
+    ){
 
         const conversation =
             item.conversations;
@@ -2205,8 +3625,10 @@ async function loadConversations(){
 
         let lastMessage = "";
 
+        let last = null;
+
         const {
-            data:last
+            data:lastData
         } =
             await supabaseClient
                 .from("messages")
@@ -2226,20 +3648,38 @@ async function loadConversations(){
                 .limit(1)
                 .maybeSingle();
 
+        last =
+            lastData;
+
+
         if(last){
 
-            if(last.type === "image"){
-                lastMessage = "🖼 صورة";
-            }else if(last.type === "voice"){
-                lastMessage = "🎙 رسالة صوتية";
+            if(
+                last.type === "image"
+            ){
+
+                lastMessage =
+                    "🖼 صورة";
+
+            }else if(
+                last.type === "voice"
+            ){
+
+                lastMessage =
+                    "🎙 رسالة صوتية";
+
             }else{
+
                 lastMessage =
                     last.content || "";
             }
         }
 
+
         const div =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
         div.className =
             "conversation-item";
@@ -2248,17 +3688,23 @@ async function loadConversations(){
             currentConversation?.id ===
             conversation.id
         ){
-            div.classList.add("active");
+
+            div.classList.add(
+                "active"
+            );
         }
 
         div.dataset.id =
             conversation.id;
 
+
         div.innerHTML = `
 
             <img
                 src="${escapeHTML(
-                    getAvatar(profile.avatar_url)
+                    getAvatar(
+                        profile.avatar_url
+                    )
                 )}"
                 alt=""
             >
@@ -2268,15 +3714,19 @@ async function loadConversations(){
                 <div class="conv-top">
 
                     <div class="conv-name">
-                        ${escapeHTML(profile.name)}
+                        ${escapeHTML(
+                            profile.name
+                        )}
                     </div>
 
                     <div class="conv-time">
-                        ${last
-                            ? formatConversationTime(
-                                last.created_at
-                              )
-                            : ""}
+                        ${
+                            last
+                                ? formatConversationTime(
+                                    last.created_at
+                                  )
+                                : ""
+                        }
                     </div>
 
                 </div>
@@ -2286,137 +3736,395 @@ async function loadConversations(){
                 </div>
 
             </div>
+
         `;
 
-        div.onclick = ()=>{
-            openConversation(
-                conversation.id,
-                profile
-            );
-        };
 
-        container.appendChild(div);
+        div.onclick =
+            ()=>{
+                openConversation(
+                    conversation.id,
+                    profile
+                );
+            };
+
+
+        container.appendChild(
+            div
+        );
     }
 }
 
 
 /* =========================================================
-   CREATE / FIND CONVERSATION
+   OPEN / CREATE CONVERSATION
+   NEW RPC SYSTEM
 ========================================================= */
 
-async function findOrCreateConversation(
-    otherProfile
+async function openChatByNumber(
+    number
 ){
 
-    /*
-     * نحاول إيجاد conversation فيها المستخدمين.
-     */
+    if(!currentUser){
+
+        throw new Error(
+            "NOT_AUTHENTICATED"
+        );
+    }
+
+    number =
+        normalizeNumber(
+            number
+        );
+
+    if(number.length !== 11){
+
+        throw new Error(
+            "INVALID_NUMBER"
+        );
+    }
+
+    if(
+        currentProfile &&
+        number ===
+        currentProfile.kallimni_number
+    ){
+
+        throw new Error(
+            "CANNOT_CHAT_WITH_SELF"
+        );
+    }
+
 
     const {
-        data:myMemberships,
-        error:myError
+        data,
+        error
     } =
-        await supabaseClient
-            .from("conversation_members")
-            .select("conversation_id")
-            .eq(
-                "user_id",
-                currentUser.id
-            );
+        await supabaseClient.rpc(
+            "open_or_create_chat",
+            {
+                p_number:
+                    number
+            }
+        );
 
-    if(myError){
-        throw myError;
+
+    if(error){
+
+        console.error(
+            "OPEN_OR_CREATE_CHAT RPC:",
+            error
+        );
+
+        throw error;
     }
 
-    for(const membership of myMemberships || []){
 
-        const {
-            data:otherMember
-        } =
-            await supabaseClient
-                .from("conversation_members")
-                .select("user_id")
-                .eq(
-                    "conversation_id",
-                    membership.conversation_id
-                )
-                .eq(
-                    "user_id",
-                    otherProfile.id
-                )
-                .maybeSingle();
+    if(
+        !data ||
+        !data.conversation_id ||
+        !data.profile
+    ){
 
-        if(otherMember){
-            return membership.conversation_id;
-        }
+        throw new Error(
+            "INVALID_RPC_RESPONSE"
+        );
     }
 
-    /*
-     * إنشاء conversation جديدة
-     */
 
-    const {
-        data:conversation,
-        error:conversationError
-    } =
-        await supabaseClient
-            .from("conversations")
-            .insert({
-                created_by:currentUser.id
-            })
-            .select()
-            .single();
+    const profile = {
 
-    if(conversationError){
-        throw conversationError;
-    }
+        id:
+            data.profile.id,
 
-    const {
-        error:membersError
-    } =
-        await supabaseClient
-            .from("conversation_members")
-            .insert([
-                {
-                    conversation_id:
-                        conversation.id,
-                    user_id:
-                        currentUser.id
-                },
-                {
-                    conversation_id:
-                        conversation.id,
-                    user_id:
-                        otherProfile.id
-                }
-            ]);
+        name:
+            data.profile.name,
 
-    if(membersError){
+        kallimni_number:
+            data.profile.kallimni_number,
 
-        await supabaseClient
-            .from("conversations")
-            .delete()
-            .eq(
-                "id",
-                conversation.id
-            );
+        avatar_url:
+            data.profile.avatar_url
+    };
 
-        throw membersError;
-    }
 
-    return conversation.id;
+    profileCache.set(
+        profile.id,
+        profile
+    );
+
+
+    return {
+
+        conversationId:
+            data.conversation_id,
+
+        profile
+    };
 }
 
 
 /* =========================================================
-   SEARCH BY NUMBER
+   NEW CHAT MODAL
 ========================================================= */
+
+$("newChatBtn").onclick =
+    ()=>{
+
+        $("newChatNumber").value =
+            "";
+
+        $("newChatMessage").textContent =
+            "";
+
+        show(
+            $("newChatModal")
+        );
+
+        setTimeout(
+            ()=>{
+                $("newChatNumber")
+                    .focus();
+            },
+            100
+        );
+    };
+
+
+$("closeNewChat").onclick =
+    ()=>{
+
+        hide(
+            $("newChatModal")
+        );
+    };
+
+
+$("newChatModal").addEventListener(
+    "click",
+    event=>{
+
+        if(
+            event.target ===
+            $("newChatModal")
+        ){
+
+            hide(
+                $("newChatModal")
+            );
+        }
+    }
+);
+
+
+$("newChatNumber").addEventListener(
+    "input",
+    event=>{
+
+        event.target.value =
+            normalizeNumber(
+                event.target.value
+            );
+    }
+);
+
+
+$("newChatNumber").addEventListener(
+    "keydown",
+    event=>{
+
+        if(
+            event.key === "Enter"
+        ){
+
+            event.preventDefault();
+
+            openNewChatByNumber();
+        }
+    }
+);
+
+
+$("openNewChatBtn").onclick =
+    openNewChatByNumber;
+
+
+async function openNewChatByNumber(){
+
+    const input =
+        $("newChatNumber");
+
+    const message =
+        $("newChatMessage");
+
+    const btn =
+        $("openNewChatBtn");
+
+    const number =
+        normalizeNumber(
+            input.value
+        );
+
+    message.textContent =
+        "";
+
+    if(number.length !== 11){
+
+        message.textContent =
+            "اكتب رقم كلّمني كامل من 11 رقم.";
+
+        input.focus();
+
+        return;
+    }
+
+
+    if(
+        currentProfile &&
+        number ===
+        currentProfile.kallimni_number
+    ){
+
+        message.textContent =
+            "ده رقم حسابك، مش ممكن تبدأ محادثة مع نفسك.";
+
+        return;
+    }
+
+
+    btn.disabled =
+        true;
+
+    btn.innerHTML =
+        "جاري فتح المحادثة...";
+
+
+    try{
+
+        const result =
+            await openChatByNumber(
+                number
+            );
+
+
+        input.value =
+            "";
+
+        hide(
+            $("newChatModal")
+        );
+
+
+        await loadConversations();
+
+
+        await openConversation(
+            result.conversationId,
+            result.profile
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "OPEN CHAT ERROR:",
+            error
+        );
+
+
+        const code =
+            error?.message ||
+            error?.code ||
+            "";
+
+
+        if(
+            code.includes(
+                "NOT_AUTHENTICATED"
+            )
+        ){
+
+            message.textContent =
+                "الجلسة انتهت. سجل دخولك مرة تانية.";
+
+        }else if(
+            code.includes(
+                "INVALID_NUMBER"
+            )
+        ){
+
+            message.textContent =
+                "رقم كلّمني لازم يكون 11 رقم.";
+
+        }else if(
+            code.includes(
+                "USER_NOT_FOUND"
+            )
+        ){
+
+            message.textContent =
+                "مش لاقي حساب مسجل بالرقم ده.";
+
+        }else if(
+            code.includes(
+                "CANNOT_CHAT_WITH_SELF"
+            )
+        ){
+
+            message.textContent =
+                "مينفعش تبدأ محادثة مع نفسك.";
+
+        }else if(
+            error?.code === "42501"
+        ){
+
+            message.textContent =
+                "Supabase رفض صلاحية فتح المحادثة. راجع SQL اللي فوق.";
+
+        }else{
+
+            message.textContent =
+                "حصل خطأ في فتح المحادثة. افتح Console لمعرفة السبب.";
+
+        }
+
+    }finally{
+
+        btn.disabled =
+            false;
+
+        btn.innerHTML =
+            `
+            فتح المحادثة
+            <span>←</span>
+            `;
+    }
+}
+
+
+/* =========================================================
+   QUICK SEARCH
+========================================================= */
+
+$("personSearch").addEventListener(
+    "input",
+    event=>{
+
+        event.target.value =
+            normalizeNumber(
+                event.target.value
+            );
+    }
+);
+
 
 $("personSearch").addEventListener(
     "keydown",
     async event=>{
 
-        if(event.key !== "Enter"){
+        if(
+            event.key !== "Enter"
+        ){
             return;
         }
 
@@ -2426,72 +4134,86 @@ $("personSearch").addEventListener(
             );
 
         if(number.length !== 11){
+
             showToast(
                 "اكتب رقم كلّمني كامل 11 رقم."
             );
+
             return;
         }
 
-        if(
-            currentProfile &&
-            number ===
-            currentProfile.kallimni_number
-        ){
-            showToast(
-                "ده رقم حسابك."
-            );
-            return;
-        }
 
         try{
 
-            const {
-                data,
+            const result =
+                await openChatByNumber(
+                    number
+                );
+
+
+            $("personSearch").value =
+                "";
+
+
+            await loadConversations();
+
+
+            await openConversation(
+                result.conversationId,
+                result.profile
+            );
+
+
+        }catch(error){
+
+            console.error(
+                "QUICK SEARCH ERROR:",
                 error
-            } =
-                await supabaseClient
-                    .from("profiles")
-                    .select("*")
-                    .eq(
-                        "kallimni_number",
-                        number
-                    )
-                    .maybeSingle();
+            );
 
-            if(error){
-                throw error;
-            }
 
-            if(!data){
+            const code =
+                error?.message ||
+                error?.code ||
+                "";
+
+
+            if(
+                code.includes(
+                    "USER_NOT_FOUND"
+                )
+            ){
 
                 showToast(
                     "مش لاقي حساب بالرقم ده."
                 );
 
-                return;
-            }
+            }else if(
+                code.includes(
+                    "CANNOT_CHAT_WITH_SELF"
+                )
+            ){
 
-            const conversationId =
-                await findOrCreateConversation(
-                    data
+                showToast(
+                    "ده رقم حسابك."
                 );
 
-            $("personSearch").value = "";
+            }else if(
+                code.includes(
+                    "NOT_AUTHENTICATED"
+                )
+            ){
 
-            await loadConversations();
+                showToast(
+                    "الجلسة انتهت، سجل دخولك تاني."
+                );
 
-            await openConversation(
-                conversationId,
-                data
-            );
+            }else{
 
-        }catch(error){
-
-            console.error(error);
-
-            showToast(
-                "حصل خطأ أثناء فتح المحادثة."
-            );
+                showToast(
+                    "حصل خطأ أثناء فتح المحادثة."
+                );
+            }
         }
     }
 );
@@ -2507,41 +4229,65 @@ async function openConversation(
 ){
 
     currentConversation = {
-        id:conversationId
+
+        id:
+            conversationId
     };
+
 
     currentOtherProfile =
         otherProfile;
 
+
     $("chatName").textContent =
         otherProfile.name;
 
+
     $("chatNumber").textContent =
         otherProfile.kallimni_number;
+
 
     $("chatAvatar").src =
         getAvatar(
             otherProfile.avatar_url
         );
 
-    hide($("chatEmpty"));
-    show($("chatContent"));
 
-    $("app").classList.add("chat-open");
+    hide(
+        $("chatEmpty")
+    );
+
+    show(
+        $("chatContent")
+    );
+
+
+    $("app")
+        .classList
+        .add("chat-open");
+
 
     document
-        .querySelectorAll(".conversation-item")
-        .forEach(item=>{
-            item.classList.toggle(
-                "active",
-                item.dataset.id ===
-                conversationId
-            );
-        });
+        .querySelectorAll(
+            ".conversation-item"
+        )
+        .forEach(
+            item=>{
+
+                item.classList.toggle(
+                    "active",
+                    item.dataset.id ===
+                    conversationId
+                );
+            }
+        );
+
 
     await checkBlockStatus();
 
+
     await loadMessages();
+
 
     subscribeMessages();
 }
@@ -2557,6 +4303,7 @@ async function checkBlockStatus(){
         return;
     }
 
+
     const {
         data,
         error
@@ -2567,42 +4314,66 @@ async function checkBlockStatus(){
                 "blocker_id,blocked_id"
             )
             .or(
-                `and(blocker_id.eq.${currentUser.id},blocked_id.eq.${currentOtherProfile.id}),and(blocker_id.eq.${currentOtherProfile.id},blocked_id.eq.${currentUser.id})`
+                `
+                and(
+                    blocker_id.eq.${currentUser.id},
+                    blocked_id.eq.${currentOtherProfile.id}
+                ),
+                and(
+                    blocker_id.eq.${currentOtherProfile.id},
+                    blocked_id.eq.${currentUser.id}
+                )
+                `
             );
+
 
     if(error){
 
         console.error(
-            "Block status error:",
+            "Block status:",
             error
         );
 
         return;
     }
 
-    blockedByMe = false;
-    blockedByOther = false;
 
-    for(const block of data || []){
+    blockedByMe =
+        false;
+
+    blockedByOther =
+        false;
+
+
+    for(
+        const block of data || []
+    ){
 
         if(
             block.blocker_id ===
             currentUser.id
         ){
-            blockedByMe = true;
+
+            blockedByMe =
+                true;
         }
+
 
         if(
             block.blocker_id ===
             currentOtherProfile.id
         ){
-            blockedByOther = true;
+
+            blockedByOther =
+                true;
         }
     }
+
 
     isBlocked =
         blockedByMe ||
         blockedByOther;
+
 
     updateBlockUI();
 }
@@ -2616,43 +4387,76 @@ function updateBlockUI(){
 
     if(blockedByMe){
 
-        hide($("blockBtn"));
-        show($("unblockBtn"));
+        hide(
+            $("blockBtn")
+        );
+
+        show(
+            $("unblockBtn")
+        );
+
 
         $("blockedBanner").textContent =
             "أنت عامل حظر للشخص ده. ألغِ الحظر لإرسال واستقبال الرسائل.";
 
-        show($("blockedBanner"));
+
+        show(
+            $("blockedBanner")
+        );
+
 
         disableComposer(true);
 
         return;
     }
 
+
     if(blockedByOther){
 
-        show($("blockBtn"));
-        hide($("unblockBtn"));
+        show(
+            $("blockBtn")
+        );
+
+        hide(
+            $("unblockBtn")
+        );
+
 
         $("blockedBanner").textContent =
             "لا يمكن إرسال رسائل لهذا الحساب حاليًا.";
 
-        show($("blockedBanner"));
+
+        show(
+            $("blockedBanner")
+        );
+
 
         disableComposer(true);
 
         return;
     }
 
-    show($("blockBtn"));
-    hide($("unblockBtn"));
-    hide($("blockedBanner"));
+
+    show(
+        $("blockBtn")
+    );
+
+    hide(
+        $("unblockBtn")
+    );
+
+    hide(
+        $("blockedBanner")
+    );
+
 
     disableComposer(false);
 }
 
 
-function disableComposer(disabled){
+function disableComposer(
+    disabled
+){
 
     $("messageInput").disabled =
         disabled;
@@ -2665,6 +4469,7 @@ function disableComposer(disabled){
 
     $("voiceBtn").disabled =
         disabled;
+
 
     $("messageInput").placeholder =
         disabled
@@ -2684,14 +4489,17 @@ $("blockBtn").onclick =
             return;
         }
 
+
         const confirmed =
             confirm(
                 `هل تريد حظر ${currentOtherProfile.name}؟`
             );
 
+
         if(!confirmed){
             return;
         }
+
 
         try{
 
@@ -2701,11 +4509,14 @@ $("blockBtn").onclick =
                 await supabaseClient
                     .from("blocks")
                     .insert({
+
                         blocker_id:
                             currentUser.id,
+
                         blocked_id:
                             currentOtherProfile.id
                     });
+
 
             if(error){
 
@@ -2713,21 +4524,30 @@ $("blockBtn").onclick =
                     error.code ===
                     "23505"
                 ){
+
                     await checkBlockStatus();
+
                     return;
                 }
 
                 throw error;
             }
 
-            blockedByMe = true;
-            isBlocked = true;
+
+            blockedByMe =
+                true;
+
+            isBlocked =
+                true;
+
 
             updateBlockUI();
+
 
             showToast(
                 "تم حظر الحساب."
             );
+
 
         }catch(error){
 
@@ -2751,6 +4571,7 @@ $("unblockBtn").onclick =
             return;
         }
 
+
         try{
 
             const {
@@ -2768,17 +4589,23 @@ $("unblockBtn").onclick =
                         currentOtherProfile.id
                     );
 
+
             if(error){
                 throw error;
             }
 
-            blockedByMe = false;
+
+            blockedByMe =
+                false;
+
 
             await checkBlockStatus();
 
+
             showToast(
-                "تم إلغاء الحظر. المحادثة رجعت طبيعية."
+                "تم إلغاء الحظر."
             );
+
 
         }catch(error){
 
@@ -2800,11 +4627,14 @@ async function loadMessages(){
     const container =
         $("messages");
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
+
 
     if(!currentConversation){
         return;
     }
+
 
     const {
         data,
@@ -2825,24 +4655,36 @@ async function loadMessages(){
             )
             .limit(100);
 
+
     if(error){
 
-        console.error(error);
+        console.error(
+            "LOAD MESSAGES:",
+            error
+        );
+
 
         container.innerHTML =
-            `<div class="empty-list">
+            `
+            <div class="empty-list">
                 مش قادر أحمل الرسائل.
-            </div>`;
+            </div>
+            `;
 
         return;
     }
 
-    for(const message of data || []){
+
+    for(
+        const message of data || []
+    ){
+
         renderMessage(
             message,
             false
         );
     }
+
 
     scrollMessages();
 }
@@ -2862,15 +4704,21 @@ function renderMessage(
             `[data-message-id="${message.id}"]`
         )
     ){
+
         return;
     }
+
 
     const mine =
         message.sender_id ===
         currentUser.id;
 
+
     const row =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     row.className =
         `message-row ${
@@ -2879,34 +4727,50 @@ function renderMessage(
                 : "theirs"
         }`;
 
+
     row.dataset.messageId =
         message.id;
 
+
     const messageBox =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     messageBox.className =
         "message";
 
-    let contentHTML = "";
 
-    if(message.type === "image"){
+    let contentHTML =
+        "";
+
+
+    if(
+        message.type ===
+        "image"
+    ){
+
+        const url =
+            message.file_url ||
+            message.content ||
+            "";
+
 
         contentHTML = `
 
             <img
                 class="message-image"
-                src="${escapeHTML(message.file_url || message.content)}"
+                src="${escapeHTML(url)}"
                 alt="صورة"
-                onclick="openImage(this.src)"
             >
 
             ${
-                message.file_url || message.content
+                url
                     ? `
                     <a
                         class="image-download"
-                        href="${escapeHTML(message.file_url || message.content)}"
+                        href="${escapeHTML(url)}"
                         download
                         target="_blank"
                     >
@@ -2915,9 +4779,13 @@ function renderMessage(
                     `
                     : ""
             }
+
         `;
 
-    }else if(message.type === "voice"){
+    }else if(
+        message.type ===
+        "voice"
+    ){
 
         contentHTML = `
 
@@ -2931,21 +4799,32 @@ function renderMessage(
                     ""
                 )}"
             ></audio>
+
         `;
 
     }else{
 
         contentHTML =
             escapeHTML(
-                message.content || ""
+                message.content ||
+                ""
             )
-            .replace(/\n/g,"<br>");
+            .replace(
+                /\n/g,
+                "<br>"
+            );
     }
+
 
     const edited =
         message.edited_at
-            ? `<span class="message-edited">تم التعديل</span>`
+            ? `
+                <span class="message-edited">
+                    تم التعديل
+                </span>
+              `
             : "";
+
 
     messageBox.innerHTML = `
 
@@ -2956,7 +4835,9 @@ function renderMessage(
         <div class="message-meta">
 
             <span>
-                ${formatTime(message.created_at)}
+                ${formatTime(
+                    message.created_at
+                )}
             </span>
 
             ${edited}
@@ -2969,7 +4850,9 @@ function renderMessage(
                 <div class="message-menu">
 
                     ${
-                        message.type === "text"
+                        message.type ===
+                        "text"
+
                             ? `
                             <button
                                 data-action="edit"
@@ -2977,6 +4860,7 @@ function renderMessage(
                                 ✏️ تعديل
                             </button>
                             `
+
                             : ""
                     }
 
@@ -2988,9 +4872,31 @@ function renderMessage(
 
                 </div>
                 `
+
                 : ""
         }
+
     `;
+
+
+    const image =
+        messageBox.querySelector(
+            ".message-image"
+        );
+
+
+    if(image){
+
+        image.addEventListener(
+            "click",
+            ()=>{
+                openImage(
+                    image.src
+                );
+            }
+        );
+    }
+
 
     if(mine){
 
@@ -3004,45 +4910,60 @@ function renderMessage(
                 ".bubble"
             );
 
-        bubble.addEventListener(
-            "contextmenu",
-            event=>{
 
-                event.preventDefault();
+        if(
+            menu &&
+            bubble
+        ){
 
-                document
-                    .querySelectorAll(
-                        ".message-menu"
-                    )
-                    .forEach(m=>{
-                        m.style.display =
-                            "none";
-                    });
+            bubble.addEventListener(
+                "contextmenu",
+                event=>{
 
-                menu.style.display =
-                    "block";
+                    event.preventDefault();
 
-                menu.style.right = "0";
-                menu.style.bottom = "28px";
-            }
-        );
 
-        if(menu){
+                    document
+                        .querySelectorAll(
+                            ".message-menu"
+                        )
+                        .forEach(
+                            m=>{
+                                m.style.display =
+                                    "none";
+                            }
+                        );
+
+
+                    menu.style.display =
+                        "block";
+
+                    menu.style.right =
+                        "0";
+
+                    menu.style.bottom =
+                        "28px";
+                }
+            );
+
 
             const editBtn =
                 menu.querySelector(
                     '[data-action="edit"]'
                 );
 
+
             const deleteBtn =
                 menu.querySelector(
                     '[data-action="delete"]'
                 );
 
+
             if(editBtn){
 
                 editBtn.onclick =
                     ()=>{
+
                         menu.style.display =
                             "none";
 
@@ -3052,23 +4973,36 @@ function renderMessage(
                     };
             }
 
-            deleteBtn.onclick =
-                ()=>{
-                    menu.style.display =
-                        "none";
 
-                    deleteMessage(
-                        message
-                    );
-                };
+            if(deleteBtn){
+
+                deleteBtn.onclick =
+                    ()=>{
+
+                        menu.style.display =
+                            "none";
+
+                        deleteMessage(
+                            message
+                        );
+                    };
+            }
         }
     }
 
-    row.appendChild(messageBox);
 
-    $("messages").appendChild(row);
+    row.appendChild(
+        messageBox
+    );
+
+
+    $("messages").appendChild(
+        row
+    );
+
 
     if(scroll){
+
         scrollMessages();
     }
 }
@@ -3081,10 +5015,14 @@ function renderMessage(
 function openImage(url){
 
     const modal =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     modal.className =
         "modal";
+
 
     modal.innerHTML = `
 
@@ -3109,7 +5047,9 @@ function openImage(url){
                     color:#000;
                     font-size:20px;
                 "
-            >×</button>
+            >
+                ×
+            </button>
 
             <img
                 src="${escapeHTML(url)}"
@@ -3124,11 +5064,16 @@ function openImage(url){
         </div>
     `;
 
-    modal.onclick = ()=>{
-        modal.remove();
-    };
 
-    document.body.appendChild(modal);
+    modal.onclick =
+        ()=>{
+            modal.remove();
+        };
+
+
+    document.body.appendChild(
+        modal
+    );
 }
 
 
@@ -3136,7 +5081,9 @@ function openImage(url){
    EDIT MESSAGE
 ========================================================= */
 
-async function editMessage(message){
+async function editMessage(
+    message
+){
 
     const newText =
         prompt(
@@ -3144,12 +5091,15 @@ async function editMessage(message){
             message.content || ""
         );
 
+
     if(
         newText === null ||
         !newText.trim()
     ){
+
         return;
     }
+
 
     try{
 
@@ -3159,10 +5109,13 @@ async function editMessage(message){
             await supabaseClient
                 .from("messages")
                 .update({
+
                     content:
                         newText.trim(),
+
                     edited_at:
-                        new Date().toISOString()
+                        new Date()
+                            .toISOString()
                 })
                 .eq(
                     "id",
@@ -3173,14 +5126,17 @@ async function editMessage(message){
                     currentUser.id
                 );
 
+
         if(error){
             throw error;
         }
+
 
         const row =
             document.querySelector(
                 `[data-message-id="${message.id}"]`
             );
+
 
         if(row){
 
@@ -3189,34 +5145,47 @@ async function editMessage(message){
                     ".bubble"
                 );
 
-            bubble.innerHTML =
-                escapeHTML(
-                    newText.trim()
-                ).replace(
-                    /\n/g,
-                    "<br>"
-                );
+
+            if(bubble){
+
+                bubble.innerHTML =
+                    escapeHTML(
+                        newText.trim()
+                    )
+                    .replace(
+                        /\n/g,
+                        "<br>"
+                    );
+            }
+
 
             const meta =
                 row.querySelector(
                     ".message-meta"
                 );
 
+
             if(
+                meta &&
                 !meta.querySelector(
                     ".message-edited"
                 )
             ){
+
                 meta.innerHTML +=
-                    `<span class="message-edited">
+                    `
+                    <span class="message-edited">
                         تم التعديل
-                    </span>`;
+                    </span>
+                    `;
             }
         }
+
 
         showToast(
             "تم تعديل الرسالة."
         );
+
 
     }catch(error){
 
@@ -3233,16 +5202,20 @@ async function editMessage(message){
    DELETE MESSAGE
 ========================================================= */
 
-async function deleteMessage(message){
+async function deleteMessage(
+    message
+){
 
     const confirmed =
         confirm(
             "هل تريد حذف الرسالة؟"
         );
 
+
     if(!confirmed){
         return;
     }
+
 
     try{
 
@@ -3261,22 +5234,27 @@ async function deleteMessage(message){
                     currentUser.id
                 );
 
+
         if(error){
             throw error;
         }
+
 
         const row =
             document.querySelector(
                 `[data-message-id="${message.id}"]`
             );
 
+
         if(row){
             row.remove();
         }
 
+
         showToast(
             "تم حذف الرسالة."
         );
+
 
     }catch(error){
 
@@ -3299,21 +5277,30 @@ async function sendText(){
         !currentConversation ||
         isBlocked
     ){
+
         return;
     }
+
 
     const input =
         $("messageInput");
 
+
     const content =
         input.value.trim();
+
 
     if(!content){
         return;
     }
 
-    input.value = "";
-    input.style.height = "44px";
+
+    input.value =
+        "";
+
+    input.style.height =
+        "44px";
+
 
     try{
 
@@ -3324,31 +5311,41 @@ async function sendText(){
             await supabaseClient
                 .from("messages")
                 .insert({
+
                     conversation_id:
                         currentConversation.id,
+
                     sender_id:
                         currentUser.id,
+
                     content,
-                    type:"text"
+
+                    type:
+                        "text"
                 })
                 .select()
                 .single();
 
+
         if(error){
             throw error;
         }
+
 
         renderMessage(
             data,
             true
         );
 
+
     }catch(error){
 
         console.error(error);
 
+
         input.value =
             content;
+
 
         showToast(
             "فشل إرسال الرسالة."
@@ -3359,6 +5356,7 @@ async function sendText(){
 
 $("sendBtn").onclick =
     sendText;
+
 
 $("messageInput").addEventListener(
     "keydown",
@@ -3376,6 +5374,7 @@ $("messageInput").addEventListener(
     }
 );
 
+
 $("messageInput").addEventListener(
     "input",
     event=>{
@@ -3383,8 +5382,10 @@ $("messageInput").addEventListener(
         const textarea =
             event.target;
 
+
         textarea.style.height =
             "44px";
+
 
         textarea.style.height =
             Math.min(
@@ -3417,28 +5418,37 @@ $("imageInput").addEventListener(
         const file =
             event.target.files[0];
 
-        event.target.value = "";
+
+        event.target.value =
+            "";
+
 
         if(!file){
             return;
         }
 
+
         if(!currentConversation){
             return;
         }
 
+
         if(isBlocked){
+
             showToast(
                 "لا يمكن إرسال صورة أثناء الحظر."
             );
+
             return;
         }
+
 
         try{
 
             showToast(
                 "جاري رفع الصورة..."
             );
+
 
             const compressed =
                 await compressImage(
@@ -3447,14 +5457,17 @@ $("imageInput").addEventListener(
                     .82
                 );
 
+
             const blob =
                 base64ToBlob(
                     compressed.base64,
                     compressed.type
                 );
 
+
             const path =
                 `${currentUser.id}/${crypto.randomUUID()}.jpg`;
+
 
             const {
                 error:uploadError
@@ -3467,13 +5480,17 @@ $("imageInput").addEventListener(
                         {
                             contentType:
                                 "image/jpeg",
-                            upsert:false
+
+                            upsert:
+                                false
                         }
                     );
+
 
             if(uploadError){
                 throw uploadError;
             }
+
 
             const {
                 data:urlData
@@ -3484,6 +5501,7 @@ $("imageInput").addEventListener(
                         path
                     );
 
+
             const {
                 data,
                 error
@@ -3491,27 +5509,36 @@ $("imageInput").addEventListener(
                 await supabaseClient
                     .from("messages")
                     .insert({
+
                         conversation_id:
                             currentConversation.id,
+
                         sender_id:
                             currentUser.id,
+
                         content:
                             urlData.publicUrl,
+
                         file_url:
                             urlData.publicUrl,
-                        type:"image"
+
+                        type:
+                            "image"
                     })
                     .select()
                     .single();
+
 
             if(error){
                 throw error;
             }
 
+
             renderMessage(
                 data,
                 true
             );
+
 
         }catch(error){
 
@@ -3533,19 +5560,23 @@ function base64ToBlob(
     const bytes =
         atob(base64);
 
+
     const array =
         new Uint8Array(
             bytes.length
         );
+
 
     for(
         let i=0;
         i<bytes.length;
         i++
     ){
+
         array[i] =
             bytes.charCodeAt(i);
     }
+
 
     return new Blob(
         [array],
@@ -3555,7 +5586,7 @@ function base64ToBlob(
 
 
 /* =========================================================
-   VOICE RECORDING
+   VOICE
 ========================================================= */
 
 $("voiceBtn").onclick =
@@ -3564,6 +5595,7 @@ $("voiceBtn").onclick =
         if(isBlocked){
             return;
         }
+
 
         if(recordingVoice){
 
@@ -3590,6 +5622,7 @@ async function startVoiceRecording(){
         return;
     }
 
+
     try{
 
         const stream =
@@ -3598,22 +5631,30 @@ async function startVoiceRecording(){
                     audio:true
                 });
 
-        voiceChunks = [];
+
+        voiceChunks =
+            [];
+
 
         mediaRecorder =
             new MediaRecorder(
                 stream
             );
 
+
         mediaRecorder.ondataavailable =
             event=>{
 
-                if(event.data.size > 0){
+                if(
+                    event.data.size > 0
+                ){
+
                     voiceChunks.push(
                         event.data
                     );
                 }
             };
+
 
         mediaRecorder.onstop =
             async ()=>{
@@ -3621,9 +5662,11 @@ async function startVoiceRecording(){
                 stream
                     .getTracks()
                     .forEach(
-                        track =>
-                            track.stop()
+                        track=>{
+                            track.stop();
+                        }
                     );
+
 
                 const blob =
                     new Blob(
@@ -3635,19 +5678,28 @@ async function startVoiceRecording(){
                         }
                     );
 
-                await uploadVoice(blob);
+
+                await uploadVoice(
+                    blob
+                );
             };
+
 
         mediaRecorder.start();
 
-        recordingVoice = true;
+
+        recordingVoice =
+            true;
+
 
         $("voiceBtn").textContent =
             "⏹";
 
+
         showToast(
             "جاري تسجيل الصوت..."
         );
+
 
     }catch(error){
 
@@ -3664,26 +5716,35 @@ function stopVoiceRecording(){
 
     if(
         mediaRecorder &&
-        mediaRecorder.state !== "inactive"
+        mediaRecorder.state !==
+        "inactive"
     ){
+
         mediaRecorder.stop();
     }
 
-    recordingVoice = false;
+
+    recordingVoice =
+        false;
+
 
     $("voiceBtn").textContent =
         "🎙";
 }
 
 
-async function uploadVoice(blob){
+async function uploadVoice(
+    blob
+){
 
     if(
         !currentConversation ||
         isBlocked
     ){
+
         return;
     }
+
 
     try{
 
@@ -3691,8 +5752,10 @@ async function uploadVoice(blob){
             "جاري رفع الرسالة الصوتية..."
         );
 
+
         const path =
             `${currentUser.id}/${crypto.randomUUID()}.webm`;
+
 
         const {
             error:uploadError
@@ -3705,13 +5768,17 @@ async function uploadVoice(blob){
                     {
                         contentType:
                             "audio/webm",
-                        upsert:false
+
+                        upsert:
+                            false
                     }
                 );
+
 
         if(uploadError){
             throw uploadError;
         }
+
 
         const {
             data:urlData
@@ -3722,6 +5789,7 @@ async function uploadVoice(blob){
                     path
                 );
 
+
         const {
             data,
             error
@@ -3729,27 +5797,36 @@ async function uploadVoice(blob){
             await supabaseClient
                 .from("messages")
                 .insert({
+
                     conversation_id:
                         currentConversation.id,
+
                     sender_id:
                         currentUser.id,
+
                     content:
                         urlData.publicUrl,
+
                     file_url:
                         urlData.publicUrl,
-                    type:"voice"
+
+                    type:
+                        "voice"
                 })
                 .select()
                 .single();
+
 
         if(error){
             throw error;
         }
 
+
         renderMessage(
             data,
             true
         );
+
 
     }catch(error){
 
@@ -3775,37 +5852,38 @@ function subscribeMessages(){
                 messageChannel
             );
 
-        messageChannel = null;
+        messageChannel =
+            null;
     }
+
 
     if(!currentConversation){
         return;
     }
 
+
     const conversationId =
         currentConversation.id;
+
 
     messageChannel =
         supabaseClient
             .channel(
-                `messages-${conversationId}`
+                `messages-${conversationId}-${Date.now()}`
             )
             .on(
                 "postgres_changes",
                 {
                     event:"INSERT",
+
                     schema:"public",
+
                     table:"messages",
+
                     filter:
                         `conversation_id=eq.${conversationId}`
                 },
                 payload=>{
-
-                    /*
-                     * مهم:
-                     * مش بنعمل loadMessages().
-                     * بنضيف الرسالة الجديدة فقط.
-                     */
 
                     renderMessage(
                         payload.new,
@@ -3817,8 +5895,11 @@ function subscribeMessages(){
                 "postgres_changes",
                 {
                     event:"UPDATE",
+
                     schema:"public",
+
                     table:"messages",
+
                     filter:
                         `conversation_id=eq.${conversationId}`
                 },
@@ -3833,8 +5914,11 @@ function subscribeMessages(){
                 "postgres_changes",
                 {
                     event:"DELETE",
+
                     schema:"public",
+
                     table:"messages",
+
                     filter:
                         `conversation_id=eq.${conversationId}`
                 },
@@ -3845,6 +5929,7 @@ function subscribeMessages(){
                             `[data-message-id="${payload.old.id}"]`
                         );
 
+
                     if(row){
                         row.remove();
                     }
@@ -3854,23 +5939,30 @@ function subscribeMessages(){
 }
 
 
-function updateRealtimeMessage(message){
+function updateRealtimeMessage(
+    message
+){
 
     const row =
         document.querySelector(
             `[data-message-id="${message.id}"]`
         );
 
+
     if(!row){
+
         renderMessage(
             message,
             true
         );
+
         return;
     }
 
+
     if(
-        message.type === "text"
+        message.type ===
+        "text"
     ){
 
         const bubble =
@@ -3878,12 +5970,15 @@ function updateRealtimeMessage(message){
                 ".bubble"
             );
 
+
         if(bubble){
 
             bubble.innerHTML =
                 escapeHTML(
-                    message.content || ""
-                ).replace(
+                    message.content ||
+                    ""
+                )
+                .replace(
                     /\n/g,
                     "<br>"
                 );
@@ -3906,6 +6001,7 @@ function subscribeConversations(){
             );
     }
 
+
     conversationChannel =
         supabaseClient
             .channel(
@@ -3915,12 +6011,16 @@ function subscribeConversations(){
                 "postgres_changes",
                 {
                     event:"*",
+
                     schema:"public",
+
                     table:"conversation_members",
+
                     filter:
                         `user_id=eq.${currentUser.id}`
                 },
                 async ()=>{
+
                     await loadConversations();
                 }
             )
@@ -3938,21 +6038,29 @@ $("settingsBtn").onclick =
         $("settingsName").value =
             currentProfile.name;
 
+
         $("settingsAvatar").src =
             getAvatar(
                 currentProfile.avatar_url
             );
 
+
         $("settingsNumber").textContent =
             `رقم كلّمني: ${currentProfile.kallimni_number}`;
 
-        show($("settingsModal"));
+
+        show(
+            $("settingsModal")
+        );
     };
 
 
 $("closeSettings").onclick =
     ()=>{
-        hide($("settingsModal"));
+
+        hide(
+            $("settingsModal")
+        );
     };
 
 
@@ -3964,7 +6072,10 @@ $("settingsModal").addEventListener(
             event.target ===
             $("settingsModal")
         ){
-            hide($("settingsModal"));
+
+            hide(
+                $("settingsModal")
+            );
         }
     }
 );
@@ -3980,8 +6091,12 @@ $("settingsForm").addEventListener(
 
         event.preventDefault();
 
+
         const name =
-            $("settingsName").value.trim();
+            $("settingsName")
+                .value
+                .trim();
+
 
         if(name.length < 2){
 
@@ -3992,18 +6107,17 @@ $("settingsForm").addEventListener(
             return;
         }
 
+
         try{
 
             let avatarUrl =
                 currentProfile.avatar_url;
 
+
             const avatarFile =
                 $("settingsAvatarInput")
                     .files[0];
 
-            /*
-             * تغيير الاسم
-             */
 
             if(avatarFile){
 
@@ -4014,14 +6128,17 @@ $("settingsForm").addEventListener(
                         .75
                     );
 
+
                 const blob =
                     base64ToBlob(
                         compressed.base64,
                         compressed.type
                     );
 
+
                 const path =
                     `${currentUser.id}/profile-${Date.now()}.jpg`;
+
 
                 const {
                     error:uploadError
@@ -4034,13 +6151,17 @@ $("settingsForm").addEventListener(
                             {
                                 contentType:
                                     "image/jpeg",
-                                upsert:true
+
+                                upsert:
+                                    true
                             }
                         );
+
 
                 if(uploadError){
                     throw uploadError;
                 }
+
 
                 const {
                     data:urlData
@@ -4051,9 +6172,11 @@ $("settingsForm").addEventListener(
                             path
                         );
 
+
                 avatarUrl =
                     urlData.publicUrl;
             }
+
 
             const {
                 data,
@@ -4062,11 +6185,15 @@ $("settingsForm").addEventListener(
                 await supabaseClient
                     .from("profiles")
                     .update({
+
                         name,
+
                         avatar_url:
                             avatarUrl,
+
                         updated_at:
-                            new Date().toISOString()
+                            new Date()
+                                .toISOString()
                     })
                     .eq(
                         "id",
@@ -4075,37 +6202,55 @@ $("settingsForm").addEventListener(
                     .select()
                     .single();
 
+
             if(error){
                 throw error;
             }
 
+
             currentProfile =
                 data;
 
+
+            profileCache.set(
+                data.id,
+                data
+            );
+
+
             $("myName").textContent =
                 data.name;
+
 
             $("myAvatar").src =
                 getAvatar(
                     data.avatar_url
                 );
 
+
             if(
                 currentOtherProfile &&
                 currentOtherProfile.id ===
                 currentUser.id
             ){
+
                 currentOtherProfile =
                     data;
             }
 
-            hide($("settingsModal"));
+
+            hide(
+                $("settingsModal")
+            );
+
 
             await loadConversations();
+
 
             showToast(
                 "تم حفظ التغييرات."
             );
+
 
         }catch(error){
 
@@ -4130,22 +6275,50 @@ $("reportBtn").onclick =
             return;
         }
 
-        $("reportReason").value = "";
 
-        show($("reportModal"));
+        $("reportReason").value =
+            "";
+
+
+        show(
+            $("reportModal")
+        );
     };
 
 
 $("closeReport").onclick =
     ()=>{
-        hide($("reportModal"));
+
+        hide(
+            $("reportModal")
+        );
     };
 
 
 $("cancelReport").onclick =
     ()=>{
-        hide($("reportModal"));
+
+        hide(
+            $("reportModal")
+        );
     };
+
+
+$("reportModal").addEventListener(
+    "click",
+    event=>{
+
+        if(
+            event.target ===
+            $("reportModal")
+        ){
+
+            hide(
+                $("reportModal")
+            );
+        }
+    }
+);
 
 
 $("reportForm").addEventListener(
@@ -4154,10 +6327,12 @@ $("reportForm").addEventListener(
 
         event.preventDefault();
 
+
         const reason =
             $("reportReason")
                 .value
                 .trim();
+
 
         if(reason.length < 3){
 
@@ -4168,6 +6343,7 @@ $("reportForm").addEventListener(
             return;
         }
 
+
         try{
 
             const {
@@ -4176,22 +6352,31 @@ $("reportForm").addEventListener(
                 await supabaseClient
                     .from("reports")
                     .insert({
+
                         reporter_id:
                             currentUser.id,
+
                         reported_id:
                             currentOtherProfile.id,
+
                         reason
                     });
+
 
             if(error){
                 throw error;
             }
 
-            hide($("reportModal"));
+
+            hide(
+                $("reportModal")
+            );
+
 
             showToast(
                 "تم إرسال البلاغ."
             );
+
 
         }catch(error){
 
@@ -4212,12 +6397,20 @@ $("reportForm").addEventListener(
 $("mobileBack").onclick =
     ()=>{
 
-        $("app").classList.remove(
-            "chat-open"
-        );
+        $("app")
+            .classList
+            .remove(
+                "chat-open"
+            );
 
-        currentConversation = null;
-        currentOtherProfile = null;
+
+        currentConversation =
+            null;
+
+
+        currentOtherProfile =
+            null;
+
 
         if(messageChannel){
 
@@ -4226,8 +6419,18 @@ $("mobileBack").onclick =
                     messageChannel
                 );
 
-            messageChannel = null;
+            messageChannel =
+                null;
         }
+
+
+        hide(
+            $("chatContent")
+        );
+
+        show(
+            $("chatEmpty")
+        );
     };
 
 
@@ -4252,10 +6455,13 @@ document.addEventListener(
                 .querySelectorAll(
                     ".message-menu"
                 )
-                .forEach(menu=>{
-                    menu.style.display =
-                        "none";
-                });
+                .forEach(
+                    menu=>{
+
+                        menu.style.display =
+                            "none";
+                    }
+                );
         }
     }
 );
@@ -4270,10 +6476,14 @@ function scrollMessages(){
     const container =
         $("messages");
 
-    requestAnimationFrame(()=>{
-        container.scrollTop =
-            container.scrollHeight;
-    });
+
+    requestAnimationFrame(
+        ()=>{
+
+            container.scrollTop =
+                container.scrollHeight;
+        }
+    );
 }
 
 
@@ -4282,15 +6492,25 @@ function scrollMessages(){
 ========================================================= */
 
 supabaseClient.auth.onAuthStateChange(
-    async (event,session)=>{
+    async (
+        event,
+        session
+    )=>{
 
         if(
-            event === "SIGNED_OUT"
+            event ===
+            "SIGNED_OUT"
         ){
-            currentUser = null;
-            currentProfile = null;
+
+            currentUser =
+                null;
+
+            currentProfile =
+                null;
+
             return;
         }
+
 
         if(
             session &&
@@ -4300,9 +6520,13 @@ supabaseClient.auth.onAuthStateChange(
             currentUser =
                 session.user;
 
+
             try{
+
                 await loadApp();
+
             }catch(error){
+
                 console.error(error);
             }
         }
@@ -4318,29 +6542,42 @@ supabaseClient.auth.onAuthStateChange(
 
     setLoading(true);
 
+
     try{
 
         const {
             data
         } =
-            await supabaseClient.auth.getSession();
+            await supabaseClient.auth
+                .getSession();
+
 
         if(data.session){
 
             currentUser =
                 data.session.user;
 
+
             await loadApp();
 
         }else{
 
-            show($("authScreen"));
-            hide($("app"));
+            show(
+                $("authScreen")
+            );
+
+            hide(
+                $("app")
+            );
         }
+
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            "INIT ERROR:",
+            error
+        );
 
     }finally{
 
@@ -4348,7 +6585,9 @@ supabaseClient.auth.onAuthStateChange(
     }
 
 })();
+
 </script>
 
 </body>
+
 </html>
