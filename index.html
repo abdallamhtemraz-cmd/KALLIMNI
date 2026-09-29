@@ -1,0 +1,3482 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>كلّمني</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --bg:#07100d;
+    --panel:#0d1714;
+    --panel2:#12201c;
+    --green:#25d366;
+    --green2:#1da851;
+    --white:#ffffff;
+    --text:#edf7f2;
+    --muted:#8ea49b;
+    --line:rgba(255,255,255,.07);
+    --danger:#ff5757;
+}
+
+body{
+    min-height:100vh;
+    font-family:Arial,Tahoma,sans-serif;
+    background:
+        radial-gradient(circle at top right,rgba(37,211,102,.12),transparent 35%),
+        radial-gradient(circle at bottom left,rgba(37,211,102,.06),transparent 30%),
+        var(--bg);
+    color:var(--text);
+}
+
+button,
+input,
+textarea{
+    font:inherit;
+}
+
+button{
+    border:0;
+    cursor:pointer;
+}
+
+.hidden{
+    display:none!important;
+}
+
+
+/* =========================================
+   AUTH
+========================================= */
+
+.auth-screen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.auth-card{
+    width:min(430px,100%);
+    background:rgba(13,23,20,.94);
+    border:1px solid var(--line);
+    border-radius:28px;
+    padding:32px;
+    box-shadow:0 30px 90px rgba(0,0,0,.45);
+    animation:cardIn .5s ease;
+}
+
+@keyframes cardIn{
+    from{
+        opacity:0;
+        transform:translateY(20px) scale(.98);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+.logo{
+    width:76px;
+    height:76px;
+    margin:auto;
+    border-radius:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(145deg,#35e879,#159b49);
+    box-shadow:0 15px 35px rgba(37,211,102,.2);
+    font-size:35px;
+}
+
+.brand{
+    text-align:center;
+    margin-top:16px;
+    font-size:30px;
+    font-weight:900;
+}
+
+.subtitle{
+    text-align:center;
+    color:var(--muted);
+    margin-top:8px;
+    line-height:1.7;
+}
+
+.auth-tabs{
+    display:flex;
+    background:#08110e;
+    border-radius:15px;
+    padding:4px;
+    margin:25px 0 20px;
+}
+
+.auth-tabs button{
+    flex:1;
+    background:transparent;
+    color:var(--muted);
+    padding:12px;
+    border-radius:11px;
+}
+
+.auth-tabs button.active{
+    background:#183126;
+    color:#fff;
+}
+
+.field{
+    margin-top:14px;
+}
+
+.field label{
+    display:block;
+    margin-bottom:8px;
+    color:#b9c9c2;
+    font-size:14px;
+}
+
+.field input{
+    width:100%;
+    border:1px solid var(--line);
+    outline:none;
+    background:#08110e;
+    color:white;
+    padding:14px 15px;
+    border-radius:14px;
+}
+
+.field input:focus{
+    border-color:rgba(37,211,102,.55);
+    box-shadow:0 0 0 3px rgba(37,211,102,.08);
+}
+
+.avatar-picker{
+    text-align:center;
+    margin-top:15px;
+}
+
+.avatar-preview{
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    object-fit:cover;
+    display:block;
+    margin:0 auto 10px;
+    border:3px solid #234b38;
+    background:#102019;
+}
+
+.file-btn{
+    display:inline-block;
+    background:#15271f;
+    color:#cfe9dc;
+    padding:9px 14px;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:13px;
+}
+
+.file-btn input{
+    display:none;
+}
+
+.primary{
+    width:100%;
+    margin-top:20px;
+    background:linear-gradient(135deg,#31e873,#1ca951);
+    color:#041009;
+    padding:14px;
+    border-radius:14px;
+    font-weight:900;
+}
+
+.primary:active{
+    transform:scale(.98);
+}
+
+.error{
+    margin-top:12px;
+    color:#ff8e8e;
+    font-size:13px;
+    text-align:center;
+    min-height:18px;
+}
+
+
+/* =========================================
+   APP
+========================================= */
+
+.app{
+    height:100vh;
+    display:flex;
+    overflow:hidden;
+}
+
+.sidebar{
+    width:380px;
+    flex-shrink:0;
+    border-left:1px solid var(--line);
+    background:rgba(10,19,16,.96);
+    display:flex;
+    flex-direction:column;
+}
+
+.sidebar-head{
+    padding:18px;
+    border-bottom:1px solid var(--line);
+}
+
+.topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.top-brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:900;
+    font-size:20px;
+}
+
+.mini-logo{
+    width:40px;
+    height:40px;
+    border-radius:13px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(145deg,#35e879,#159b49);
+}
+
+.icon-btn{
+    width:40px;
+    height:40px;
+    border-radius:12px;
+    background:#14241e;
+    color:white;
+}
+
+.profile-mini{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:18px;
+    padding:10px;
+    border-radius:15px;
+    background:#0b1511;
+}
+
+.profile-mini img{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.profile-info{
+    min-width:0;
+}
+
+.profile-info strong{
+    display:block;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.profile-info small{
+    color:var(--muted);
+}
+
+.search-box{
+    margin-top:15px;
+    display:flex;
+    gap:8px;
+}
+
+.search-box input{
+    flex:1;
+    min-width:0;
+    border:1px solid var(--line);
+    background:#08110e;
+    color:white;
+    padding:12px 13px;
+    border-radius:13px;
+    outline:none;
+}
+
+.search-box button{
+    width:46px;
+    border-radius:13px;
+    background:#1b3327;
+    color:#65ee96;
+}
+
+.chats{
+    flex:1;
+    overflow:auto;
+}
+
+.empty{
+    padding:50px 25px;
+    text-align:center;
+    color:var(--muted);
+    line-height:1.8;
+}
+
+.chat-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:14px 17px;
+    cursor:pointer;
+    border-bottom:1px solid rgba(255,255,255,.035);
+    transition:.2s;
+}
+
+.chat-item:hover{
+    background:#102019;
+}
+
+.chat-item.active{
+    background:#153025;
+}
+
+.chat-item img{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    object-fit:cover;
+    flex-shrink:0;
+}
+
+.chat-info{
+    min-width:0;
+    flex:1;
+}
+
+.chat-info-top{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+}
+
+.chat-info strong{
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.chat-info time{
+    color:#73877f;
+    font-size:11px;
+}
+
+.chat-preview{
+    color:#81978d;
+    font-size:13px;
+    margin-top:5px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+
+/* =========================================
+   CHAT
+========================================= */
+
+.chat{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    background:
+        radial-gradient(circle at 20% 10%,rgba(37,211,102,.035),transparent 25%),
+        #07100d;
+}
+
+.chat-empty{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:var(--muted);
+}
+
+.chat-empty .big{
+    font-size:65px;
+    margin-bottom:15px;
+}
+
+.chat-head{
+    height:75px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 18px;
+    border-bottom:1px solid var(--line);
+    background:rgba(10,19,16,.9);
+    backdrop-filter:blur(15px);
+}
+
+.back-mobile{
+    display:none;
+}
+
+.chat-head img{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.chat-head-info{
+    flex:1;
+}
+
+.chat-head-info strong{
+    display:block;
+}
+
+.chat-head-info small{
+    color:var(--muted);
+}
+
+.chat-actions{
+    display:flex;
+    gap:7px;
+}
+
+.chat-actions button{
+    width:40px;
+    height:40px;
+    border-radius:12px;
+    background:#12231c;
+    color:white;
+}
+
+.chat-actions button.danger{
+    color:#ff7b7b;
+}
+
+.messages{
+    flex:1;
+    overflow:auto;
+    padding:22px clamp(12px,4vw,60px);
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.message-row{
+    display:flex;
+    width:100%;
+}
+
+.message-row.mine{
+    justify-content:flex-start;
+}
+
+.message-row.theirs{
+    justify-content:flex-end;
+}
+
+.message{
+    position:relative;
+    max-width:min(70%,550px);
+    padding:9px 12px;
+    border-radius:16px;
+    line-height:1.55;
+    animation:messageIn .18s ease;
+}
+
+@keyframes messageIn{
+    from{
+        opacity:0;
+        transform:translateY(5px);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+/* أنا = أبيض */
+.mine .message{
+    background:#fff;
+    color:#111;
+    border-bottom-right-radius:5px;
+}
+
+/* الشخص الآخر = أسود */
+.theirs .message{
+    background:#111;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.07);
+    border-bottom-left-radius:5px;
+}
+
+.message-text{
+    white-space:pre-wrap;
+    word-break:break-word;
+}
+
+.message-meta{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:6px;
+    font-size:10px;
+    margin-top:4px;
+    opacity:.55;
+}
+
+.edited{
+    font-size:9px;
+}
+
+.message-menu{
+    position:absolute;
+    top:5px;
+    left:5px;
+    display:none;
+    background:#18251f;
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    z-index:10;
+}
+
+.message:hover .message-menu{
+    display:block;
+}
+
+.message-menu button{
+    display:block;
+    width:110px;
+    padding:9px;
+    text-align:right;
+    background:transparent;
+    color:white;
+}
+
+.message-menu button:hover{
+    background:#23382e;
+}
+
+.message-menu button.delete{
+    color:#ff7777;
+}
+
+.message-image{
+    max-width:300px;
+    max-height:350px;
+    display:block;
+    border-radius:12px;
+    object-fit:cover;
+    cursor:pointer;
+}
+
+.file-actions{
+    display:flex;
+    gap:6px;
+    margin-top:7px;
+}
+
+.file-actions button{
+    background:rgba(0,0,0,.16);
+    color:inherit;
+    padding:5px 9px;
+    border-radius:8px;
+    font-size:11px;
+}
+
+.composer{
+    padding:10px 15px 15px;
+    border-top:1px solid var(--line);
+    background:#09130f;
+}
+
+.editing{
+    background:#11251a;
+    border-radius:12px;
+    padding:8px 12px;
+    margin-bottom:8px;
+    display:flex;
+    justify-content:space-between;
+    color:#bceacb;
+    font-size:13px;
+}
+
+.composer-row{
+    display:flex;
+    align-items:flex-end;
+    gap:8px;
+}
+
+.composer textarea{
+    flex:1;
+    resize:none;
+    max-height:130px;
+    min-height:46px;
+    background:#13231d;
+    border:1px solid var(--line);
+    color:white;
+    border-radius:15px;
+    padding:13px;
+    outline:none;
+}
+
+.composer button{
+    width:46px;
+    height:46px;
+    flex-shrink:0;
+    border-radius:14px;
+    background:#163325;
+    color:#72f3a1;
+}
+
+.composer .send{
+    background:#25d366;
+    color:#041009;
+    font-weight:900;
+}
+
+.recording{
+    background:#5a2020!important;
+    color:#ff8585!important;
+    animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+    50%{transform:scale(1.05)}
+}
+
+
+/* =========================================
+   MODAL
+========================================= */
+
+.modal{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    background:rgba(0,0,0,.7);
+    backdrop-filter:blur(8px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.modal-card{
+    width:min(420px,100%);
+    background:#0d1714;
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 30px 100px rgba(0,0,0,.55);
+}
+
+.modal-card h3{
+    margin-bottom:15px;
+}
+
+.modal-actions{
+    display:flex;
+    gap:8px;
+    margin-top:15px;
+}
+
+.modal-actions button{
+    flex:1;
+    padding:12px;
+    border-radius:12px;
+    background:#193027;
+    color:white;
+}
+
+.modal-actions .danger{
+    background:#512020;
+    color:#ffaaaa;
+}
+
+.profile-large{
+    text-align:center;
+}
+
+.profile-large img{
+    width:110px;
+    height:110px;
+    border-radius:50%;
+    object-fit:cover;
+    margin-bottom:10px;
+}
+
+.number{
+    color:#72e998;
+    font-family:monospace;
+    letter-spacing:2px;
+}
+
+.toast{
+    position:fixed;
+    bottom:25px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    opacity:0;
+    pointer-events:none;
+    background:#eaf8f0;
+    color:#07100d;
+    padding:12px 18px;
+    border-radius:13px;
+    z-index:999;
+    transition:.25s;
+    font-size:13px;
+    box-shadow:0 15px 40px rgba(0,0,0,.3);
+}
+
+.toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media(max-width:800px){
+
+    .sidebar{
+        width:100%;
+    }
+
+    .chat{
+        display:none;
+        width:100%;
+    }
+
+    .app.chat-open .sidebar{
+        display:none;
+    }
+
+    .app.chat-open .chat{
+        display:flex;
+    }
+
+    .back-mobile{
+        display:block!important;
+        background:#12231c;
+        color:white;
+        width:40px;
+        height:40px;
+        border-radius:12px;
+    }
+
+    .message{
+        max-width:84%;
+    }
+
+    .message-image{
+        max-width:240px;
+    }
+
+    .auth-card{
+        padding:24px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================================
+     AUTH SCREEN
+========================================= -->
+
+<section id="authScreen" class="auth-screen">
+
+    <div class="auth-card">
+
+        <div class="logo">💬</div>
+
+        <div class="brand">كلّمني</div>
+
+        <div class="subtitle">
+            اتكلم مع أصحابك برقم كلّمني الخاص بيك
+        </div>
+
+        <div class="auth-tabs">
+
+            <button id="loginTab" class="active">
+                تسجيل الدخول
+            </button>
+
+            <button id="registerTab">
+                حساب جديد
+            </button>
+
+        </div>
+
+
+        <!-- LOGIN -->
+
+        <div id="loginForm">
+
+            <div class="field">
+
+                <label>
+                    رقم كلّمني
+                </label>
+
+                <input
+                    id="loginNumber"
+                    inputmode="numeric"
+                    maxlength="11"
+                    placeholder="مثال: 58291473620"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label>
+                    كلمة المرور
+                </label>
+
+                <input
+                    id="loginPassword"
+                    type="password"
+                    placeholder="كلمة المرور"
+                >
+
+            </div>
+
+            <button id="loginBtn" class="primary">
+                دخول
+            </button>
+
+            <div id="loginError" class="error"></div>
+
+        </div>
+
+
+        <!-- REGISTER -->
+
+        <div id="registerForm" class="hidden">
+
+            <div class="avatar-picker">
+
+                <img
+                    id="avatarPreview"
+                    class="avatar-preview"
+                    src="https://placehold.co/200x200/12201c/ffffff?text=PHOTO"
+                >
+
+                <label class="file-btn">
+
+                    اختر صورتك
+
+                    <input
+                        id="avatarInput"
+                        type="file"
+                        accept="image/*"
+                    >
+
+                </label>
+
+            </div>
+
+            <div class="field">
+
+                <label>
+                    اسمك
+                </label>
+
+                <input
+                    id="registerName"
+                    maxlength="40"
+                    placeholder="اكتب اسمك"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <label>
+                    كلمة المرور
+                </label>
+
+                <input
+                    id="registerPassword"
+                    type="password"
+                    placeholder="اختار كلمة مرور قوية"
+                >
+
+            </div>
+
+            <button id="registerBtn" class="primary">
+                إنشاء الحساب
+            </button>
+
+            <div id="registerError" class="error"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     APP
+========================================= -->
+
+<main id="app" class="app hidden">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-head">
+
+            <div class="topbar">
+
+                <div class="top-brand">
+
+                    <div class="mini-logo">
+                        💬
+                    </div>
+
+                    كلّمني
+
+                </div>
+
+                <button
+                    id="settingsBtn"
+                    class="icon-btn"
+                >
+                    ⚙
+                </button>
+
+            </div>
+
+
+            <div class="profile-mini">
+
+                <img id="myAvatar">
+
+                <div class="profile-info">
+
+                    <strong id="myName"></strong>
+
+                    <small>
+                        <span id="myNumber"></span>
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="search-box">
+
+                <input
+                    id="numberSearch"
+                    inputmode="numeric"
+                    maxlength="11"
+                    placeholder="اكتب رقم كلّمني..."
+                >
+
+                <button id="searchBtn">
+                    🔎
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div id="chatList" class="chats">
+
+            <div class="empty">
+                مفيش محادثات لسه.<br>
+                اكتب رقم شخص وابدأ محادثة.
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- CHAT -->
+
+    <section class="chat">
+
+        <div id="chatEmpty" class="chat-empty">
+
+            <div>
+
+                <div class="big">
+                    💬
+                </div>
+
+                <h2>
+                    اختار محادثة
+                </h2>
+
+                <p>
+                    ابدأ محادثة جديدة عن طريق رقم كلّمني
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div id="chatWindow" class="hidden" style="height:100%;display:flex;flex-direction:column;">
+
+            <header class="chat-head">
+
+                <button
+                    id="backMobile"
+                    class="back-mobile"
+                >
+                    ←
+                </button>
+
+                <img id="chatAvatar">
+
+                <div class="chat-head-info">
+
+                    <strong id="chatName"></strong>
+
+                    <small id="chatNumber"></small>
+
+                </div>
+
+                <div class="chat-actions">
+
+                    <button id="profileBtn">
+                        👤
+                    </button>
+
+                    <button id="blockBtn" class="danger">
+                        🚫
+                    </button>
+
+                </div>
+
+            </header>
+
+
+            <div id="messages" class="messages"></div>
+
+
+            <div class="composer">
+
+                <div
+                    id="editingBar"
+                    class="editing hidden"
+                >
+
+                    <span>
+                        ✏️ تعديل الرسالة
+                    </span>
+
+                    <button id="cancelEdit">
+                        إلغاء
+                    </button>
+
+                </div>
+
+
+                <div class="composer-row">
+
+                    <label
+                        class="icon-btn"
+                        style="display:flex;align-items:center;justify-content:center;"
+                    >
+
+                        🖼️
+
+                        <input
+                            id="imageInput"
+                            type="file"
+                            accept="image/*"
+                            hidden
+                        >
+
+                    </label>
+
+
+                    <textarea
+                        id="messageInput"
+                        rows="1"
+                        placeholder="اكتب رسالة..."
+                    ></textarea>
+
+
+                    <button id="recordBtn">
+                        🎙️
+                    </button>
+
+
+                    <button
+                        id="sendBtn"
+                        class="send"
+                    >
+                        ➤
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================================
+     PROFILE MODAL
+========================================= -->
+
+<div id="profileModal" class="modal hidden">
+
+    <div class="modal-card profile-large">
+
+        <img id="modalAvatar">
+
+        <h3 id="modalName"></h3>
+
+        <p class="number" id="modalNumber"></p>
+
+        <div class="modal-actions">
+
+            <button id="closeProfile">
+                إغلاق
+            </button>
+
+            <button
+                id="reportBtn"
+                class="danger"
+            >
+                إبلاغ
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     SETTINGS MODAL
+========================================= -->
+
+<div id="settingsModal" class="modal hidden">
+
+    <div class="modal-card">
+
+        <h3>
+            إعدادات الحساب
+        </h3>
+
+        <div class="avatar-picker">
+
+            <img
+                id="settingsAvatarPreview"
+                class="avatar-preview"
+            >
+
+            <label class="file-btn">
+
+                تغيير الصورة
+
+                <input
+                    id="settingsAvatarInput"
+                    type="file"
+                    accept="image/*"
+                >
+
+            </label>
+
+        </div>
+
+        <div class="field">
+
+            <label>
+                الاسم
+            </label>
+
+            <input
+                id="settingsName"
+                maxlength="40"
+            >
+
+        </div>
+
+        <div class="field">
+
+            <label>
+                رقم كلّمني
+            </label>
+
+            <input
+                id="settingsNumber"
+                disabled
+            >
+
+        </div>
+
+        <div class="modal-actions">
+
+            <button id="closeSettings">
+                إلغاء
+            </button>
+
+            <button id="saveSettings">
+                حفظ
+            </button>
+
+        </div>
+
+        <div class="modal-actions">
+
+            <button
+                id="logoutBtn"
+                class="danger"
+            >
+                تسجيل الخروج
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="toast" class="toast"></div>
+
+
+<script>
+
+/* =====================================================
+   1. SUPABASE
+===================================================== */
+
+const SUPABASE_URL = "https://jwuixbsvascbfehyeorz.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_CQG93tU1Ds1Lb3KyNTUb4w_Q0zetIoZ";
+
+const supabaseClient =
+    supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =====================================================
+   2. GLOBAL STATE
+===================================================== */
+
+let currentUser = null;
+let myProfile = null;
+
+let currentChatUser = null;
+let currentConversation = null;
+
+let realtimeChannel = null;
+
+let mediaRecorder = null;
+let audioChunks = [];
+let recording = false;
+
+let editingMessageId = null;
+
+let avatarFile = null;
+let settingsAvatarFile = null;
+
+
+/* =====================================================
+   3. ELEMENTS
+===================================================== */
+
+const authScreen =
+    document.getElementById("authScreen");
+
+const app =
+    document.getElementById("app");
+
+const loginTab =
+    document.getElementById("loginTab");
+
+const registerTab =
+    document.getElementById("registerTab");
+
+const loginForm =
+    document.getElementById("loginForm");
+
+const registerForm =
+    document.getElementById("registerForm");
+
+const loginNumber =
+    document.getElementById("loginNumber");
+
+const loginPassword =
+    document.getElementById("loginPassword");
+
+const registerName =
+    document.getElementById("registerName");
+
+const registerPassword =
+    document.getElementById("registerPassword");
+
+const avatarInput =
+    document.getElementById("avatarInput");
+
+const avatarPreview =
+    document.getElementById("avatarPreview");
+
+const myAvatar =
+    document.getElementById("myAvatar");
+
+const myName =
+    document.getElementById("myName");
+
+const myNumber =
+    document.getElementById("myNumber");
+
+const numberSearch =
+    document.getElementById("numberSearch");
+
+const chatList =
+    document.getElementById("chatList");
+
+const chatEmpty =
+    document.getElementById("chatEmpty");
+
+const chatWindow =
+    document.getElementById("chatWindow");
+
+const chatAvatar =
+    document.getElementById("chatAvatar");
+
+const chatName =
+    document.getElementById("chatName");
+
+const chatNumber =
+    document.getElementById("chatNumber");
+
+const messages =
+    document.getElementById("messages");
+
+const messageInput =
+    document.getElementById("messageInput");
+
+const imageInput =
+    document.getElementById("imageInput");
+
+const recordBtn =
+    document.getElementById("recordBtn");
+
+const editingBar =
+    document.getElementById("editingBar");
+
+const profileModal =
+    document.getElementById("profileModal");
+
+const settingsModal =
+    document.getElementById("settingsModal");
+
+const toast =
+    document.getElementById("toast");
+
+
+/* =====================================================
+   4. HELPERS
+===================================================== */
+
+function showToast(text){
+
+    toast.textContent = text;
+
+    toast.classList.add("show");
+
+    setTimeout(()=>{
+        toast.classList.remove("show");
+    },2500);
+}
+
+
+function setError(id,text){
+
+    document.getElementById(id).textContent =
+        text || "";
+
+}
+
+
+function cleanNumber(value){
+
+    return value
+        .replace(/\D/g,"")
+        .slice(0,11);
+
+}
+
+
+function internalEmail(number){
+
+    return `${number}@kallimni.app`;
+
+}
+
+
+function randomNumber(){
+
+    let result =
+        Math.floor(
+            10000000000 +
+            Math.random() * 90000000000
+        );
+
+    return String(result);
+
+}
+
+
+async function generateUniqueNumber(){
+
+    for(let i=0;i<20;i++){
+
+        const number =
+            randomNumber();
+
+        const {data,error} =
+            await supabaseClient
+                .from("profiles")
+                .select("id")
+                .eq("kallimni_number",number)
+                .maybeSingle();
+
+        if(!error && !data){
+            return number;
+        }
+
+    }
+
+    throw new Error(
+        "تعذر إنشاء رقم فريد"
+    );
+
+}
+
+
+function escapeHTML(text){
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        text ?? "";
+
+    return div.innerHTML;
+
+}
+
+
+function formatTime(date){
+
+    return new Intl.DateTimeFormat(
+        "ar-EG",
+        {
+            hour:"numeric",
+            minute:"2-digit"
+        }
+    ).format(new Date(date));
+
+}
+
+
+function formatPreview(message){
+
+    if(!message) return "";
+
+    if(message.message_type === "image")
+        return "📷 صورة";
+
+    if(message.message_type === "voice")
+        return "🎙️ رسالة صوتية";
+
+    return message.text || "";
+
+}
+
+
+/* =====================================================
+   5. AUTH TABS
+===================================================== */
+
+loginTab.onclick = ()=>{
+
+    loginTab.classList.add("active");
+    registerTab.classList.remove("active");
+
+    loginForm.classList.remove("hidden");
+    registerForm.classList.add("hidden");
+
+};
+
+
+registerTab.onclick = ()=>{
+
+    registerTab.classList.add("active");
+    loginTab.classList.remove("active");
+
+    registerForm.classList.remove("hidden");
+    loginForm.classList.add("hidden");
+
+};
+
+
+/* =====================================================
+   6. AVATAR PREVIEW
+===================================================== */
+
+avatarInput.onchange = ()=>{
+
+    const file =
+        avatarInput.files?.[0];
+
+    if(!file) return;
+
+    avatarFile = file;
+
+    avatarPreview.src =
+        URL.createObjectURL(file);
+
+};
+
+
+/* =====================================================
+   7. REGISTER
+===================================================== */
+
+document.getElementById("registerBtn").onclick =
+async ()=>{
+
+    setError("registerError","");
+
+    const name =
+        registerName.value.trim();
+
+    const password =
+        registerPassword.value;
+
+    if(name.length < 2){
+
+        setError(
+            "registerError",
+            "اكتب اسم صحيح."
+        );
+
+        return;
+
+    }
+
+    if(password.length < 6){
+
+        setError(
+            "registerError",
+            "كلمة المرور لازم تكون 6 حروف أو أرقام على الأقل."
+        );
+
+        return;
+
+    }
+
+    if(!avatarFile){
+
+        setError(
+            "registerError",
+            "لازم تختار صورة."
+        );
+
+        return;
+
+    }
+
+    try{
+
+        showToast("جاري إنشاء الحساب...");
+
+        const number =
+            await generateUniqueNumber();
+
+        const email =
+            internalEmail(number);
+
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient.auth.signUp({
+                email,
+                password
+            });
+
+
+        if(error)
+            throw error;
+
+
+        if(!data.user)
+            throw new Error(
+                "لم يتم إنشاء المستخدم."
+            );
+
+
+        currentUser =
+            data.user;
+
+
+        /* رفع الصورة */
+
+        const extension =
+            avatarFile.name
+                .split(".")
+                .pop()
+                .toLowerCase();
+
+        const path =
+            `${currentUser.id}/avatar.${extension}`;
+
+
+        const upload =
+            await supabaseClient
+                .storage
+                .from("avatars")
+                .upload(
+                    path,
+                    avatarFile,
+                    {
+                        upsert:true,
+                        contentType:avatarFile.type
+                    }
+                );
+
+
+        if(upload.error)
+            throw upload.error;
+
+
+        const avatarUrl =
+            supabaseClient
+                .storage
+                .from("avatars")
+                .getPublicUrl(path)
+                .data
+                .publicUrl;
+
+
+        /* إنشاء Profile */
+
+        const profile =
+            await supabaseClient
+                .from("profiles")
+                .insert({
+                    id:currentUser.id,
+                    kallimni_number:number,
+                    name,
+                    avatar_url:avatarUrl
+                })
+                .select()
+                .single();
+
+
+        if(profile.error)
+            throw profile.error;
+
+
+        myProfile =
+            profile.data;
+
+
+        showToast(
+            `تم إنشاء حسابك! رقمك ${number}`
+        );
+
+
+        await loadApp();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        setError(
+            "registerError",
+            error.message ||
+            "حصل خطأ أثناء إنشاء الحساب."
+        );
+
+    }
+
+};
+
+
+/* =====================================================
+   8. LOGIN
+===================================================== */
+
+document.getElementById("loginBtn").onclick =
+async ()=>{
+
+    setError("loginError","");
+
+    const number =
+        cleanNumber(
+            loginNumber.value
+        );
+
+    const password =
+        loginPassword.value;
+
+
+    if(number.length !== 11){
+
+        setError(
+            "loginError",
+            "رقم كلّمني لازم يكون 11 رقم."
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient.auth
+                .signInWithPassword({
+                    email:internalEmail(number),
+                    password
+                });
+
+
+        if(error)
+            throw error;
+
+
+        currentUser =
+            data.user;
+
+
+        await loadApp();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        setError(
+            "loginError",
+            "رقم كلّمني أو كلمة المرور غير صحيحة."
+        );
+
+    }
+
+};
+
+
+/* =====================================================
+   9. LOAD PROFILE
+===================================================== */
+
+async function loadProfile(){
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("profiles")
+            .select("*")
+            .eq("id",currentUser.id)
+            .single();
+
+
+    if(error)
+        throw error;
+
+
+    myProfile =
+        data;
+
+
+    myAvatar.src =
+        data.avatar_url;
+
+    myName.textContent =
+        data.name;
+
+    myNumber.textContent =
+        data.kallimni_number;
+
+}
+
+
+/* =====================================================
+   10. LOAD APP
+===================================================== */
+
+async function loadApp(){
+
+    await loadProfile();
+
+    authScreen.classList.add("hidden");
+
+    app.classList.remove("hidden");
+
+    await loadChats();
+
+}
+
+
+/* =====================================================
+   11. SEARCH USER
+===================================================== */
+
+document.getElementById("searchBtn").onclick =
+searchUser;
+
+numberSearch.addEventListener(
+    "keydown",
+    e=>{
+        if(e.key === "Enter")
+            searchUser();
+    }
+);
+
+
+async function searchUser(){
+
+    const number =
+        cleanNumber(
+            numberSearch.value
+        );
+
+
+    if(number.length !== 11){
+
+        showToast(
+            "اكتب رقم مكوّن من 11 رقم."
+        );
+
+        return;
+
+    }
+
+
+    if(number === myProfile.kallimni_number){
+
+        showToast(
+            "ده رقم حسابك."
+        );
+
+        return;
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("profiles")
+            .select("*")
+            .eq("kallimni_number",number)
+            .maybeSingle();
+
+
+    if(error){
+
+        showToast(
+            "حصل خطأ أثناء البحث."
+        );
+
+        return;
+
+    }
+
+
+    if(!data){
+
+        showToast(
+            "الرقم ده مش موجود."
+        );
+
+        return;
+
+    }
+
+
+    await openConversation(data);
+
+    numberSearch.value = "";
+
+}
+
+
+/* =====================================================
+   12. OPEN CONVERSATION
+===================================================== */
+
+async function openConversation(otherUser){
+
+    currentChatUser =
+        otherUser;
+
+
+    /* ابحث عن محادثة موجودة */
+
+    const {
+        data:myMemberships,
+        error:memberError
+    } =
+        await supabaseClient
+            .from("conversation_members")
+            .select("conversation_id")
+            .eq("user_id",myProfile.id);
+
+
+    if(memberError)
+        throw memberError;
+
+
+    let conversation = null;
+
+
+    if(myMemberships?.length){
+
+        const ids =
+            myMemberships.map(
+                x=>x.conversation_id
+            );
+
+
+        const {
+            data:otherMemberships
+        } =
+            await supabaseClient
+                .from("conversation_members")
+                .select("conversation_id")
+                .eq("user_id",otherUser.id)
+                .in("conversation_id",ids);
+
+
+        if(otherMemberships?.length){
+
+            conversation =
+                otherMemberships[0];
+
+        }
+
+    }
+
+
+    if(!conversation){
+
+        const created =
+            await supabaseClient
+                .from("conversations")
+                .insert({})
+                .select()
+                .single();
+
+
+        if(created.error)
+            throw created.error;
+
+
+        conversation =
+            created.data;
+
+
+        const members =
+            await supabaseClient
+                .from("conversation_members")
+                .insert([
+                    {
+                        conversation_id:conversation.id,
+                        user_id:myProfile.id
+                    },
+                    {
+                        conversation_id:conversation.id,
+                        user_id:otherUser.id
+                    }
+                ]);
+
+
+        if(members.error)
+            throw members.error;
+
+    }
+
+
+    currentConversation =
+        conversation;
+
+
+    chatEmpty.classList.add("hidden");
+
+    chatWindow.classList.remove("hidden");
+
+    app.classList.add("chat-open");
+
+
+    chatAvatar.src =
+        otherUser.avatar_url;
+
+    chatName.textContent =
+        otherUser.name;
+
+    chatNumber.textContent =
+        otherUser.kallimni_number;
+
+
+    await loadMessages();
+
+    subscribeMessages();
+
+}
+
+
+/* =====================================================
+   13. LOAD MESSAGES
+===================================================== */
+
+async function loadMessages(){
+
+    messages.innerHTML = "";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .select("*")
+            .eq(
+                "conversation_id",
+                currentConversation.id
+            )
+            .order(
+                "created_at",
+                {ascending:true}
+            )
+            .limit(100);
+
+
+    if(error){
+
+        console.error(error);
+
+        return;
+
+    }
+
+
+    for(const message of data){
+
+        renderMessage(message);
+
+    }
+
+
+    scrollMessages();
+
+}
+
+
+/* =====================================================
+   14. RENDER MESSAGE
+===================================================== */
+
+function renderMessage(message){
+
+    const mine =
+        message.sender_id === myProfile.id;
+
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        `message-row ${mine ? "mine" : "theirs"}`;
+
+
+    const bubble =
+        document.createElement("div");
+
+    bubble.className =
+        "message";
+
+
+    let content = "";
+
+
+    if(message.deleted_at){
+
+        content =
+            `<div style="opacity:.5;font-style:italic">
+                تم حذف الرسالة
+             </div>`;
+
+    }else if(message.message_type === "image"){
+
+        content =
+            `
+            <img
+                class="message-image"
+                src="${escapeHTML(message.file_url)}"
+                onclick="window.open('${escapeHTML(message.file_url)}','_blank')"
+            >
+
+            <div class="file-actions">
+
+                <button
+                    onclick="downloadFile('${escapeHTML(message.file_url)}')"
+                >
+                    ⬇️ تنزيل
+                </button>
+
+            </div>
+            `;
+
+    }else if(message.message_type === "voice"){
+
+        content =
+            `
+            <audio
+                controls
+                src="${escapeHTML(message.file_url)}"
+                style="max-width:260px;"
+            ></audio>
+            `;
+
+    }else{
+
+        content =
+            `
+            <div class="message-text">
+                ${escapeHTML(message.text)}
+            </div>
+            `;
+
+    }
+
+
+    bubble.innerHTML =
+        `
+        ${content}
+
+        <div class="message-meta">
+
+            ${formatTime(message.created_at)}
+
+            ${
+                message.edited
+                ? `<span class="edited">تم التعديل</span>`
+                : ""
+            }
+
+        </div>
+        `;
+
+
+    if(
+        mine &&
+        !message.deleted_at
+    ){
+
+        const menu =
+            document.createElement("div");
+
+        menu.className =
+            "message-menu";
+
+
+        if(message.message_type === "text"){
+
+            const edit =
+                document.createElement("button");
+
+            edit.textContent =
+                "✏️ تعديل";
+
+            edit.onclick =
+                ()=>{
+                    startEdit(message);
+                };
+
+            menu.appendChild(edit);
+
+        }
+
+
+        const deleteBtn =
+            document.createElement("button");
+
+        deleteBtn.className =
+            "delete";
+
+        deleteBtn.textContent =
+            "🗑️ حذف";
+
+        deleteBtn.onclick =
+            ()=>{
+                deleteMessage(message);
+            };
+
+
+        menu.appendChild(deleteBtn);
+
+        bubble.appendChild(menu);
+
+    }
+
+
+    row.appendChild(bubble);
+
+    messages.appendChild(row);
+
+}
+
+
+function scrollMessages(){
+
+    messages.scrollTop =
+        messages.scrollHeight;
+
+}
+
+
+/* =====================================================
+   15. SEND TEXT
+===================================================== */
+
+document.getElementById("sendBtn").onclick =
+sendText;
+
+
+messageInput.addEventListener(
+    "keydown",
+    e=>{
+
+        if(
+            e.key === "Enter" &&
+            !e.shiftKey
+        ){
+
+            e.preventDefault();
+
+            sendText();
+
+        }
+
+    }
+);
+
+
+async function sendText(){
+
+    const text =
+        messageInput.value.trim();
+
+
+    if(!text)
+        return;
+
+
+    if(!currentConversation)
+        return;
+
+
+    if(editingMessageId){
+
+        await updateMessage(
+            editingMessageId,
+            text
+        );
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .insert({
+                conversation_id:
+                    currentConversation.id,
+
+                sender_id:
+                    myProfile.id,
+
+                message_type:
+                    "text",
+
+                text
+            });
+
+
+    if(error){
+
+        showToast(
+            "تعذر إرسال الرسالة."
+        );
+
+        console.error(error);
+
+        return;
+
+    }
+
+
+    messageInput.value = "";
+
+}
+
+
+/* =====================================================
+   16. EDIT MESSAGE
+===================================================== */
+
+function startEdit(message){
+
+    editingMessageId =
+        message.id;
+
+    messageInput.value =
+        message.text || "";
+
+    editingBar.classList.remove(
+        "hidden"
+    );
+
+    messageInput.focus();
+
+}
+
+
+document.getElementById("cancelEdit").onclick =
+()=>{
+
+    editingMessageId = null;
+
+    messageInput.value = "";
+
+    editingBar.classList.add(
+        "hidden"
+    );
+
+};
+
+
+async function updateMessage(
+    id,
+    text
+){
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .update({
+                text,
+                edited:true,
+                updated_at:
+                    new Date().toISOString()
+            })
+            .eq("id",id)
+            .eq("sender_id",myProfile.id);
+
+
+    if(error){
+
+        showToast(
+            "تعذر تعديل الرسالة."
+        );
+
+        return;
+
+    }
+
+
+    editingMessageId = null;
+
+    messageInput.value = "";
+
+    editingBar.classList.add(
+        "hidden"
+    );
+
+}
+
+
+/* =====================================================
+   17. DELETE MESSAGE
+===================================================== */
+
+async function deleteMessage(message){
+
+    const ok =
+        confirm(
+            "هل تريد حذف الرسالة؟"
+        );
+
+
+    if(!ok)
+        return;
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("messages")
+            .update({
+                deleted_at:
+                    new Date().toISOString()
+            })
+            .eq("id",message.id)
+            .eq("sender_id",myProfile.id);
+
+
+    if(error){
+
+        showToast(
+            "تعذر حذف الرسالة."
+        );
+
+        return;
+
+    }
+
+
+    showToast(
+        "تم حذف الرسالة."
+    );
+
+}
+
+
+/* =====================================================
+   18. IMAGE UPLOAD
+===================================================== */
+
+imageInput.onchange =
+async ()=>{
+
+    const file =
+        imageInput.files?.[0];
+
+    if(!file)
+        return;
+
+
+    if(!currentConversation)
+        return;
+
+
+    if(file.size > 15 * 1024 * 1024){
+
+        showToast(
+            "الصورة أكبر من 15MB."
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        showToast(
+            "جاري رفع الصورة..."
+        );
+
+
+        const extension =
+            file.name
+                .split(".")
+                .pop()
+                .toLowerCase();
+
+
+        const path =
+            `${currentUser.id}/${crypto.randomUUID()}.${extension}`;
+
+
+        const upload =
+            await supabaseClient
+                .storage
+                .from("chat-files")
+                .upload(
+                    path,
+                    file,
+                    {
+                        contentType:file.type
+                    }
+                );
+
+
+        if(upload.error)
+            throw upload.error;
+
+
+        const url =
+            supabaseClient
+                .storage
+                .from("chat-files")
+                .getPublicUrl(path)
+                .data
+                .publicUrl;
+
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from("messages")
+                .insert({
+                    conversation_id:
+                        currentConversation.id,
+
+                    sender_id:
+                        myProfile.id,
+
+                    message_type:
+                        "image",
+
+                    file_url:url
+                });
+
+
+        if(error)
+            throw error;
+
+
+        showToast(
+            "تم إرسال الصورة."
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        showToast(
+            "تعذر إرسال الصورة."
+        );
+
+    }
+
+
+    imageInput.value = "";
+
+};
+
+
+/* =====================================================
+   19. DOWNLOAD IMAGE
+===================================================== */
+
+window.downloadFile =
+async function(url){
+
+    try{
+
+        const response =
+            await fetch(url);
+
+        const blob =
+            await response.blob();
+
+        const blobUrl =
+            URL.createObjectURL(blob);
+
+        const a =
+            document.createElement("a");
+
+        a.href =
+            blobUrl;
+
+        a.download =
+            `kallimni-${Date.now()}`;
+
+        document.body.appendChild(a);
+
+        a.click();
+
+        a.remove();
+
+        URL.revokeObjectURL(blobUrl);
+
+    }catch{
+
+        window.open(
+            url,
+            "_blank"
+        );
+
+    }
+
+};
+
+
+/* =====================================================
+   20. VOICE RECORDING
+===================================================== */
+
+recordBtn.onclick =
+async ()=>{
+
+    if(recording){
+
+        mediaRecorder.stop();
+
+        recording = false;
+
+        recordBtn.classList.remove(
+            "recording"
+        );
+
+        recordBtn.textContent =
+            "🎙️";
+
+        return;
+
+    }
+
+
+    if(!currentConversation)
+        return;
+
+
+    try{
+
+        const stream =
+            await navigator.mediaDevices
+                .getUserMedia({
+                    audio:true
+                });
+
+
+        audioChunks = [];
+
+
+        mediaRecorder =
+            new MediaRecorder(stream);
+
+
+        mediaRecorder.ondataavailable =
+            event=>{
+
+                if(event.data.size > 0)
+                    audioChunks.push(
+                        event.data
+                    );
+
+            };
+
+
+        mediaRecorder.onstop =
+            async ()=>{
+
+                stream
+                    .getTracks()
+                    .forEach(
+                        track=>track.stop()
+                    );
+
+
+                const blob =
+                    new Blob(
+                        audioChunks,
+                        {
+                            type:
+                            mediaRecorder.mimeType ||
+                            "audio/webm"
+                        }
+                    );
+
+
+                await uploadVoice(blob);
+
+            };
+
+
+        mediaRecorder.start();
+
+        recording = true;
+
+        recordBtn.classList.add(
+            "recording"
+        );
+
+        recordBtn.textContent =
+            "⏹️";
+
+
+        showToast(
+            "جاري تسجيل الرسالة الصوتية..."
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        showToast(
+            "لازم تسمح للموقع باستخدام الميكروفون."
+        );
+
+    }
+
+};
+
+
+async function uploadVoice(blob){
+
+    try{
+
+        showToast(
+            "جاري إرسال الصوت..."
+        );
+
+
+        const path =
+            `${currentUser.id}/${crypto.randomUUID()}.webm`;
+
+
+        const upload =
+            await supabaseClient
+                .storage
+                .from("chat-files")
+                .upload(
+                    path,
+                    blob,
+                    {
+                        contentType:
+                            "audio/webm"
+                    }
+                );
+
+
+        if(upload.error)
+            throw upload.error;
+
+
+        const url =
+            supabaseClient
+                .storage
+                .from("chat-files")
+                .getPublicUrl(path)
+                .data
+                .publicUrl;
+
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from("messages")
+                .insert({
+                    conversation_id:
+                        currentConversation.id,
+
+                    sender_id:
+                        myProfile.id,
+
+                    message_type:
+                        "voice",
+
+                    file_url:url
+                });
+
+
+        if(error)
+            throw error;
+
+
+    }catch(error){
+
+        console.error(error);
+
+        showToast(
+            "تعذر إرسال الرسالة الصوتية."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   21. REALTIME
+===================================================== */
+
+function subscribeMessages(){
+
+    if(realtimeChannel){
+
+        supabaseClient
+            .removeChannel(
+                realtimeChannel
+            );
+
+    }
+
+
+    realtimeChannel =
+        supabaseClient
+            .channel(
+                `conversation-${currentConversation.id}`
+            )
+            .on(
+                "postgres_changes",
+                {
+                    event:"*",
+                    schema:"public",
+                    table:"messages",
+                    filter:
+                    `conversation_id=eq.${currentConversation.id}`
+                },
+                async ()=>{
+                    await loadMessages();
+                    await loadChats();
+                }
+            )
+            .subscribe();
+
+}
+
+
+/* =====================================================
+   22. LOAD CHAT LIST
+===================================================== */
+
+async function loadChats(){
+
+    const {
+        data:members
+    } =
+        await supabaseClient
+            .from("conversation_members")
+            .select("conversation_id")
+            .eq("user_id",myProfile.id);
+
+
+    if(!members?.length){
+
+        chatList.innerHTML =
+            `
+            <div class="empty">
+                مفيش محادثات لسه.<br>
+                اكتب رقم شخص وابدأ محادثة.
+            </div>
+            `;
+
+        return;
+
+    }
+
+
+    const ids =
+        members.map(
+            x=>x.conversation_id
+        );
+
+
+    const {
+        data:allMembers
+    } =
+        await supabaseClient
+            .from("conversation_members")
+            .select(
+                "conversation_id,user_id"
+            )
+            .in(
+                "conversation_id",
+                ids
+            );
+
+
+    const otherIds =
+        allMembers
+            .filter(
+                x=>x.user_id !== myProfile.id
+            )
+            .map(
+                x=>x.user_id
+            );
+
+
+    if(!otherIds.length)
+        return;
+
+
+    const {
+        data:profiles
+    } =
+        await supabaseClient
+            .from("profiles")
+            .select("*")
+            .in(
+                "id",
+                otherIds
+            );
+
+
+    chatList.innerHTML = "";
+
+
+    for(
+        const profile of profiles || []
+    ){
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            "chat-item";
+
+
+        item.innerHTML =
+            `
+            <img src="${escapeHTML(profile.avatar_url)}">
+
+            <div class="chat-info">
+
+                <div class="chat-info-top">
+
+                    <strong>
+                        ${escapeHTML(profile.name)}
+                    </strong>
+
+                    <time>
+                        ${escapeHTML(profile.kallimni_number)}
+                    </time>
+
+                </div>
+
+                <div class="chat-preview">
+                    اضغط لفتح المحادثة
+                </div>
+
+            </div>
+            `;
+
+
+        item.onclick =
+            ()=>{
+                openConversation(profile);
+            };
+
+
+        chatList.appendChild(item);
+
+    }
+
+}
+
+
+/* =====================================================
+   23. PROFILE
+===================================================== */
+
+document.getElementById("profileBtn").onclick =
+()=>{
+
+    if(!currentChatUser)
+        return;
+
+
+    document.getElementById(
+        "modalAvatar"
+    ).src =
+        currentChatUser.avatar_url;
+
+
+    document.getElementById(
+        "modalName"
+    ).textContent =
+        currentChatUser.name;
+
+
+    document.getElementById(
+        "modalNumber"
+    ).textContent =
+        currentChatUser.kallimni_number;
+
+
+    profileModal.classList.remove(
+        "hidden"
+    );
+
+};
+
+
+document.getElementById("closeProfile").onclick =
+()=>{
+
+    profileModal.classList.add(
+        "hidden"
+    );
+
+};
+
+
+/* =====================================================
+   24. BLOCK
+===================================================== */
+
+document.getElementById("blockBtn").onclick =
+async ()=>{
+
+    if(!currentChatUser)
+        return;
+
+
+    const ok =
+        confirm(
+            `هل تريد حظر ${currentChatUser.name}؟`
+        );
+
+
+    if(!ok)
+        return;
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("blocks")
+            .insert({
+                blocker_id:
+                    myProfile.id,
+
+                blocked_id:
+                    currentChatUser.id
+            });
+
+
+    if(error){
+
+        if(error.code === "23505"){
+
+            showToast(
+                "الشخص محظور بالفعل."
+            );
+
+        }else{
+
+            showToast(
+                "تعذر الحظر."
+            );
+
+        }
+
+        return;
+
+    }
+
+
+    showToast(
+        "تم حظر المستخدم."
+    );
+
+};
+
+
+/* =====================================================
+   25. REPORT
+===================================================== */
+
+document.getElementById("reportBtn").onclick =
+async ()=>{
+
+    if(!currentChatUser)
+        return;
+
+
+    const reason =
+        prompt(
+            "اكتب سبب الإبلاغ:"
+        );
+
+
+    if(!reason)
+        return;
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("reports")
+            .insert({
+                reporter_id:
+                    myProfile.id,
+
+                reported_id:
+                    currentChatUser.id,
+
+                reason:
+                    reason.trim()
+            });
+
+
+    if(error){
+
+        showToast(
+            "تعذر إرسال البلاغ."
+        );
+
+        return;
+
+    }
+
+
+    showToast(
+        "تم إرسال البلاغ."
+    );
+
+};
+
+
+/* =====================================================
+   26. SETTINGS
+===================================================== */
+
+document.getElementById("settingsBtn").onclick =
+()=>{
+
+    document.getElementById(
+        "settingsName"
+    ).value =
+        myProfile.name;
+
+
+    document.getElementById(
+        "settingsNumber"
+    ).value =
+        myProfile.kallimni_number;
+
+
+    document.getElementById(
+        "settingsAvatarPreview"
+    ).src =
+        myProfile.avatar_url;
+
+
+    settingsModal.classList.remove(
+        "hidden"
+    );
+
+};
+
+
+document.getElementById("closeSettings").onclick =
+()=>{
+
+    settingsModal.classList.add(
+        "hidden"
+    );
+
+};
+
+
+document.getElementById(
+    "settingsAvatarInput"
+).onchange =
+e=>{
+
+    const file =
+        e.target.files?.[0];
+
+    if(!file)
+        return;
+
+    settingsAvatarFile =
+        file;
+
+    document.getElementById(
+        "settingsAvatarPreview"
+    ).src =
+        URL.createObjectURL(file);
+
+};
+
+
+document.getElementById("saveSettings").onclick =
+async ()=>{
+
+    try{
+
+        const name =
+            document.getElementById(
+                "settingsName"
+            ).value.trim();
+
+
+        if(name.length < 2){
+
+            showToast(
+                "الاسم قصير جدًا."
+            );
+
+            return;
+
+        }
+
+
+        let avatarUrl =
+            myProfile.avatar_url;
+
+
+        if(settingsAvatarFile){
+
+            const extension =
+                settingsAvatarFile.name
+                    .split(".")
+                    .pop()
+                    .toLowerCase();
+
+
+            const path =
+                `${currentUser.id}/avatar.${extension}`;
+
+
+            const upload =
+                await supabaseClient
+                    .storage
+                    .from("avatars")
+                    .upload(
+                        path,
+                        settingsAvatarFile,
+                        {
+                            upsert:true,
+                            contentType:
+                                settingsAvatarFile.type
+                        }
+                    );
+
+
+            if(upload.error)
+                throw upload.error;
+
+
+            avatarUrl =
+                supabaseClient
+                    .storage
+                    .from("avatars")
+                    .getPublicUrl(path)
+                    .data
+                    .publicUrl;
+
+        }
+
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("profiles")
+                .update({
+                    name,
+                    avatar_url:avatarUrl,
+                    updated_at:
+                        new Date().toISOString()
+                })
+                .eq(
+                    "id",
+                    currentUser.id
+                )
+                .select()
+                .single();
+
+
+        if(error)
+            throw error;
+
+
+        myProfile =
+            data;
+
+
+        myName.textContent =
+            data.name;
+
+        myAvatar.src =
+            data.avatar_url;
+
+
+        if(currentChatUser?.id === data.id){
+
+            chatName.textContent =
+                data.name;
+
+            chatAvatar.src =
+                data.avatar_url;
+
+        }
+
+
+        settingsAvatarFile = null;
+
+        settingsModal.classList.add(
+            "hidden"
+        );
+
+
+        showToast(
+            "تم حفظ التغييرات."
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        showToast(
+            "تعذر حفظ التغييرات."
+        );
+
+    }
+
+};
+
+
+/* =====================================================
+   27. LOGOUT
+===================================================== */
+
+document.getElementById("logoutBtn").onclick =
+async ()=>{
+
+    await supabaseClient.auth.signOut();
+
+    location.reload();
+
+};
+
+
+/* =====================================================
+   28. MOBILE BACK
+===================================================== */
+
+document.getElementById("backMobile").onclick =
+()=>{
+
+    app.classList.remove(
+        "chat-open"
+    );
+
+};
+
+
+/* =====================================================
+   29. AUTH SESSION
+===================================================== */
+
+async function boot(){
+
+    const {
+        data
+    } =
+        await supabaseClient.auth.getSession();
+
+
+    if(data.session?.user){
+
+        currentUser =
+            data.session.user;
+
+
+        try{
+
+            await loadApp();
+
+        }catch(error){
+
+            console.error(error);
+
+        }
+
+    }
+
+}
+
+
+supabaseClient.auth.onAuthStateChange(
+    async(event,session)=>{
+
+        if(
+            event === "SIGNED_IN" &&
+            session?.user
+        ){
+
+            currentUser =
+                session.user;
+
+        }
+
+    }
+);
+
+
+boot();
+
+</script>
+</body>
+</html>
