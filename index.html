@@ -1221,6 +1221,29 @@ button{
     background:rgba(12,15,20,.96);
 }
 
+/* =====================================================
+   WHATSAPP-LIKE TYPING INDICATOR
+===================================================== */
+
+.typing-indicator{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    min-height:28px;
+    padding:4px 12px 8px;
+    color:var(--muted,#8d96a8);
+    font-size:12px;
+}
+.typing-indicator.hidden{display:none}
+.typing-indicator span{
+    width:6px;height:6px;border-radius:50%;background:currentColor;
+    animation:typingDot 1.2s infinite ease-in-out;
+}
+.typing-indicator span:nth-child(2){animation-delay:.15s}
+.typing-indicator span:nth-child(3){animation-delay:.30s}
+.typing-indicator b{margin-inline-start:4px;font-weight:600}
+@keyframes typingDot{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-4px);opacity:1}}
+
 .blocked-banner{
 
     margin-bottom:9px;
@@ -2291,6 +2314,16 @@ button{
 
 
                 <div
+                    id="typingIndicator"
+                    class="typing-indicator hidden"
+                    aria-live="polite"
+                >
+                    <span></span><span></span><span></span>
+                    <b>يكتب الآن...</b>
+                </div>
+
+
+                <div
                     id="blockedBanner"
                     class="blocked-banner hidden"
                 ></div>
@@ -2640,6 +2673,13 @@ let currentOtherProfile = null;
 
 let messageChannel = null;
 let conversationChannel = null;
+let profileChannel = null;
+let typingTimer = null;
+let typingStopTimer = null;
+let isTypingBroadcasting = false;
+let notificationsReady = false;
+let unreadCount = 0;
+let originalDocumentTitle = document.title;
 
 let isBlocked = false;
 let blockedByMe = false;
@@ -2941,6 +2981,69 @@ function compressImage(
     );
 }
 
+
+/* =========================================================
+   WHATSAPP-LIKE NOTIFICATIONS + TYPING
+========================================================= */
+
+async function requestNotificationPermission(){
+    if(!('Notification' in window)) return;
+    if(Notification.permission === 'granted'){ notificationsReady=true; return; }
+    if(Notification.permission === 'default'){
+        try{ notificationsReady = (await Notification.requestPermission()) === 'granted'; }
+        catch(error){ console.warn('NOTIFICATION PERMISSION:',error); }
+    }
+}
+
+function markNotificationsRead(){ unreadCount=0; document.title=originalDocumentTitle; }
+
+function notifyIncomingMessage(message,profile){
+    if(!message || message.sender_id===currentUser?.id) return;
+    const same=currentConversation?.id===message.conversation_id;
+    if(same && document.visibilityState==='visible') return;
+    unreadCount++;
+    document.title=`(${unreadCount}) رسالة جديدة • كلّمني`;
+    const name=profile?.name||'رسالة جديدة';
+    let body='رسالة جديدة';
+    if(message.message_type==='image') body='🖼 أرسل لك صورة';
+    else if(message.message_type==='voice') body='🎙 أرسل لك رسالة صوتية';
+    else body=message.text||'رسالة جديدة';
+    showToast(`💬 ${name}: ${body}`);
+    if('Notification' in window && Notification.permission==='granted'){
+        try{
+            const n=new Notification(name,{body,icon:getAvatar(profile?.avatar_url),tag:`kallimni-${message.conversation_id}`});
+            n.onclick=()=>{window.focus();n.close();};
+        }catch(error){ console.warn('NOTIFICATION:',error); }
+    }
+}
+
+function setTypingVisible(value){ const el=$('typingIndicator'); if(!el)return; value?show(el):hide(el); }
+
+async function broadcastTyping(value){
+    if(!messageChannel||!currentConversation)return;
+    try{ await messageChannel.send({type:'broadcast',event:'typing',payload:{user_id:currentUser.id,typing:!!value}}); }
+    catch(error){ console.warn('TYPING BROADCAST:',error); }
+}
+
+function handleTypingInput(){
+    if(!currentConversation||isBlocked)return;
+    const value=$('messageInput').value.trim();
+    if(value){
+        if(!isTypingBroadcasting){isTypingBroadcasting=true;broadcastTyping(true);}
+        clearTimeout(typingStopTimer);
+        typingStopTimer=setTimeout(()=>{isTypingBroadcasting=false;broadcastTyping(false);},1200);
+    }else{
+        clearTimeout(typingStopTimer);
+        if(isTypingBroadcasting){isTypingBroadcasting=false;broadcastTyping(false);}
+    }
+}
+
+async function refreshBlockBeforeSend(){
+    if(!currentOtherProfile)return true;
+    await checkBlockStatus();
+    if(isBlocked){showToast('لا يمكن إرسال رسالة أثناء الحظر.');return false;}
+    return true;
+}
 
 /* =========================================================
    AUTH TABS
@@ -3385,9 +3488,11 @@ async function loadApp(){
                 currentProfile.avatar_url
             );
 
-        hide($("authScreen"));
+        hide($('authScreen'));
 
-        show($("app"));
+        show($('app'));
+
+        requestNotificationPermission();
 
         await loadConversations();
 
@@ -3431,16 +3536,8 @@ $("logoutBtn").onclick =
                     null;
             }
 
-            if(conversationChannel){
-
-                await supabaseClient
-                    .removeChannel(
-                        conversationChannel
-                    );
-
-                conversationChannel =
-                    null;
-            }
+            if(conversationChannel){await supabaseClient.removeChannel(conversationChannel);conversationChannel=null;}
+            if(profileChannel){await supabaseClient.removeChannel(profileChannel);profileChannel=null;}
 
         }catch(error){
 
@@ -4406,10 +4503,14 @@ async function openConversation(
     await checkBlockStatus();
 
 
+    markNotificationsRead();
+    setTypingVisible(false);
+    isTypingBroadcasting=false;
+
     await loadMessages();
 
-
     subscribeMessages();
+    subscribeOtherProfile();
 }
 
 
@@ -5396,13 +5497,11 @@ async function deleteMessage(
 
 async function sendText(){
 
-    if(
-        !currentConversation ||
-        isBlocked
-    ){
-
-        return;
-    }
+    if(!currentConversation)return;
+    if(!(await refreshBlockBeforeSend()))return;
+    clearTimeout(typingStopTimer);
+    isTypingBroadcasting=false;
+    broadcastTyping(false);
 
 
     const input =
@@ -5516,9 +5615,16 @@ $("messageInput").addEventListener(
                 textarea.scrollHeight,
                 120
             ) + "px";
+
+        handleTypingInput();
     }
 );
 
+
+$('messageInput').addEventListener('blur',()=>{
+    clearTimeout(typingStopTimer);
+    if(isTypingBroadcasting){isTypingBroadcasting=false;broadcastTyping(false);}
+});
 
 /* =========================================================
    IMAGE SEND
@@ -5557,15 +5663,7 @@ $("imageInput").addEventListener(
         }
 
 
-        if(isBlocked){
-
-            showToast(
-                "لا يمكن إرسال صورة أثناء الحظر."
-            );
-
-            return;
-        }
-
+        if(!(await refreshBlockBeforeSend()))return;
 
         try{
 
@@ -5749,21 +5847,13 @@ async function startVoiceRecording(){
 
     try{
 
-        const stream =
-            await navigator.mediaDevices
-                .getUserMedia({
-                    audio:true
-                });
+        if(!(await refreshBlockBeforeSend()))return;
 
-
-        voiceChunks =
-            [];
-
-
-        mediaRecorder =
-            new MediaRecorder(
-                stream
-            );
+        const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+        voiceChunks=[];
+        const mimeCandidates=['audio/webm;codecs=opus','audio/webm','audio/mp4','audio/ogg;codecs=opus'];
+        const supportedMime=mimeCandidates.find(type=>window.MediaRecorder?.isTypeSupported?.(type))||'';
+        mediaRecorder=supportedMime?new MediaRecorder(stream,{mimeType:supportedMime}):new MediaRecorder(stream);
 
 
         mediaRecorder.ondataavailable =
@@ -5877,8 +5967,9 @@ async function uploadVoice(
         );
 
 
-        const path =
-            `${currentUser.id}/${crypto.randomUUID()}.webm`;
+        const mimeType=blob.type||mediaRecorder?.mimeType||'audio/webm';
+        const extension=mimeType.includes('mp4')?'m4a':mimeType.includes('ogg')?'ogg':'webm';
+        const path=`${currentUser.id}/${crypto.randomUUID()}.${extension}`;
 
 
         const {
@@ -5891,8 +5982,7 @@ async function uploadVoice(
                     blob,
                     {
                         contentType:
-                            "audio/webm",
-
+                            mimeType,
                         upsert:
                             false
                     }
@@ -5969,145 +6059,52 @@ async function uploadVoice(
 
 function subscribeMessages(){
 
-    if(messageChannel){
+    if(messageChannel){supabaseClient.removeChannel(messageChannel);messageChannel=null;}
+    if(!currentConversation)return;
+    const conversationId=currentConversation.id;
 
-        supabaseClient
-            .removeChannel(
-                messageChannel
-            );
-
-        messageChannel =
-            null;
-    }
-
-
-    if(!currentConversation){
-        return;
-    }
-
-
-    const conversationId =
-        currentConversation.id;
-
-
-    messageChannel =
-        supabaseClient
-            .channel(
-                `messages-${conversationId}-${Date.now()}`
-            )
-            .on(
-                "postgres_changes",
-                {
-                    event:"INSERT",
-
-                    schema:"public",
-
-                    table:"messages",
-
-                    filter:
-                        `conversation_id=eq.${conversationId}`
-                },
-                payload=>{
-
-                    renderMessage(
-                        payload.new,
-                        true
-                    );
-                }
-            )
-            .on(
-                "postgres_changes",
-                {
-                    event:"UPDATE",
-
-                    schema:"public",
-
-                    table:"messages",
-
-                    filter:
-                        `conversation_id=eq.${conversationId}`
-                },
-                payload=>{
-
-                    updateRealtimeMessage(
-                        payload.new
-                    );
-                }
-            )
-            .on(
-                "postgres_changes",
-                {
-                    event:"DELETE",
-
-                    schema:"public",
-
-                    table:"messages",
-
-                    filter:
-                        `conversation_id=eq.${conversationId}`
-                },
-                payload=>{
-
-                    const row =
-                        document.querySelector(
-                            `[data-message-id="${payload.old.id}"]`
-                        );
-
-
-                    if(row){
-                        row.remove();
-                    }
-                }
-            )
-            .subscribe();
+    messageChannel=supabaseClient.channel(`messages-${conversationId}`)
+        .on('broadcast',{event:'typing'},payload=>{
+            const d=payload?.payload||{};
+            if(d.user_id===currentUser.id)return;
+            if(d.typing){
+                setTypingVisible(true);
+                clearTimeout(typingTimer);
+                typingTimer=setTimeout(()=>setTypingVisible(false),2200);
+            }else{clearTimeout(typingTimer);setTypingVisible(false);}
+        })
+        .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`conversation_id=eq.${conversationId}`},async payload=>{
+            renderMessage(payload.new,true);
+            setTypingVisible(false);
+            if(payload.new.sender_id!==currentUser.id){
+                const profile=currentOtherProfile||await getConversationOtherUser(conversationId);
+                notifyIncomingMessage(payload.new,profile);
+            }
+            await loadConversations();
+        })
+        .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages',filter:`conversation_id=eq.${conversationId}`},payload=>updateRealtimeMessage(payload.new))
+        .on('postgres_changes',{event:'DELETE',schema:'public',table:'messages',filter:`conversation_id=eq.${conversationId}`},payload=>{
+            const row=document.querySelector(`[data-message-id="${payload.old.id}"]`);
+            if(row)row.remove();
+            loadConversations();
+        })
+        .subscribe(status=>console.log('MESSAGE CHANNEL:',status));
 }
 
-
-function updateRealtimeMessage(
-    message
-){
-
-    const row =
-        document.querySelector(
-            `[data-message-id="${message.id}"]`
-        );
-
-
-    if(!row){
-
-        renderMessage(
-            message,
-            true
-        );
-
-        return;
-    }
-
-
-    if(
-        message.message_type ===
-        "text"
-    ){
-
-        const bubble =
-            row.querySelector(
-                ".bubble"
-            );
-
-
-        if(bubble){
-
-            bubble.innerHTML =
-                escapeHTML(
-                    message.text ||
-                    ""
-                )
-                .replace(
-                    /\n/g,
-                    "<br>"
-                );
-        }
-    }
+function subscribeOtherProfile(){
+    if(profileChannel){supabaseClient.removeChannel(profileChannel);profileChannel=null;}
+    if(!currentOtherProfile)return;
+    const profileId=currentOtherProfile.id;
+    profileChannel=supabaseClient.channel(`profile-${profileId}`)
+        .on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles',filter:`id=eq.${profileId}`},async payload=>{
+            const profile=payload.new;
+            profileCache.set(profile.id,profile);
+            currentOtherProfile=profile;
+            $('chatName').textContent=profile.name;
+            $('chatNumber').textContent=profile.kallimni_number;
+            $('chatAvatar').src=getAvatar(profile.avatar_url);
+            await loadConversations();
+        }).subscribe();
 }
 
 
@@ -6116,39 +6113,19 @@ function updateRealtimeMessage(
 ========================================================= */
 
 function subscribeConversations(){
-
-    if(conversationChannel){
-
-        supabaseClient
-            .removeChannel(
-                conversationChannel
-            );
-    }
-
-
-    conversationChannel =
-        supabaseClient
-            .channel(
-                `user-conversations-${currentUser.id}`
-            )
-            .on(
-                "postgres_changes",
-                {
-                    event:"*",
-
-                    schema:"public",
-
-                    table:"conversation_members",
-
-                    filter:
-                        `user_id=eq.${currentUser.id}`
-                },
-                async ()=>{
-
-                    await loadConversations();
-                }
-            )
-            .subscribe();
+    if(conversationChannel){supabaseClient.removeChannel(conversationChannel);conversationChannel=null;}
+    conversationChannel=supabaseClient.channel(`user-conversations-${currentUser.id}`)
+        .on('postgres_changes',{event:'*',schema:'public',table:'conversation_members',filter:`user_id=eq.${currentUser.id}`},async()=>loadConversations())
+        .on('postgres_changes',{event:'UPDATE',schema:'public',table:'conversations'},async()=>loadConversations())
+        .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},async payload=>{
+            if(payload.new.sender_id!==currentUser.id){
+                const profile=await getConversationOtherUser(payload.new.conversation_id);
+                if(profile)notifyIncomingMessage(payload.new,profile);
+            }
+            await loadConversations();
+        })
+        .on('postgres_changes',{event:'DELETE',schema:'public',table:'messages'},async()=>loadConversations())
+        .subscribe(status=>console.log('CONVERSATION CHANNEL:',status));
 }
 
 
@@ -6536,16 +6513,11 @@ $("mobileBack").onclick =
             null;
 
 
-        if(messageChannel){
-
-            supabaseClient
-                .removeChannel(
-                    messageChannel
-                );
-
-            messageChannel =
-                null;
-        }
+        if(messageChannel){supabaseClient.removeChannel(messageChannel);messageChannel=null;}
+        if(profileChannel){supabaseClient.removeChannel(profileChannel);profileChannel=null;}
+        clearTimeout(typingTimer);
+        clearTimeout(typingStopTimer);
+        setTypingVisible(false);
 
 
         hide(
@@ -6610,6 +6582,10 @@ function scrollMessages(){
     );
 }
 
+
+document.addEventListener('click',()=>{
+    if(!notificationsReady)requestNotificationPermission();
+},{passive:true});
 
 /* =========================================================
    AUTH SESSION
