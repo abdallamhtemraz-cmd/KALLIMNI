@@ -1854,6 +1854,19 @@ button{
     }
 }
 
+
+/* FINAL CHAT SIZE FIX */
+html,body{width:100%;height:100%;overflow:hidden;}
+body{min-height:100vh;}
+.app,.app-shell,.main-layout,.layout,.container{min-height:0;}
+.chat{height:100%;min-height:0;overflow:hidden;display:flex;flex-direction:column;}
+.messages{flex:1 1 auto!important;height:auto!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;overflow-x:hidden!important;padding:20px 22px 28px!important;}
+.chat-header{flex:0 0 76px;}
+.composer,.message-input-area,.chat-input{flex-shrink:0;}
+@media(max-width:800px){
+  .chat{height:100dvh!important;}
+  .messages{padding:14px 12px 22px!important;}
+}
 </style>
 
 </head>
