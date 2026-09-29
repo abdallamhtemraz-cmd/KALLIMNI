@@ -3796,17 +3796,42 @@ async function openChatByNumber(
     }
 
 
-    const {
-        data,
-        error
-    } =
-        await supabaseClient.rpc(
-            "open_or_create_chat",
-            {
-                p_number:
-                    number
-            }
-        );
+const { data: profile, error: profileError } = await supabaseClient
+    .from("profiles")
+    .select("id, kallimni_number, display_name, username, avatar_url")
+    .eq("kallimni_number", number)
+    .maybeSingle();
+
+if (profileError) {
+    console.error("FIND PROFILE ERROR:", profileError);
+    throw profileError;
+}
+
+if (!profile) {
+    throw new Error("USER_NOT_FOUND");
+}
+
+// بعد ما جبنا UUID بتاع الشخص
+const { data: chatId, error: chatError } = await supabaseClient.rpc(
+    "open_or_create_chat",
+    {
+        p_other_user_id: profile.id
+    }
+);
+
+if (chatError) {
+    console.error("OPEN_OR_CREATE_CHAT RPC:", chatError);
+    throw chatError;
+}
+
+if (!chatId) {
+    throw new Error("CHAT_NOT_CREATED");
+}
+
+return {
+    chatId,
+    profile
+};
 
 
     if(error){
