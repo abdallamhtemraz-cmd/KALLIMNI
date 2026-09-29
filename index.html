@@ -3464,21 +3464,18 @@ async function getConversationOtherUser(
     conversationId
 ){
 
+    /*
+     * لا نعتمد على Supabase nested relationships هنا.
+     * نجيب user_id من conversation_members أولًا،
+     * ثم نجيب الـprofile من جدول profiles بشكل منفصل.
+     */
     const {
-        data,
-        error
+        data:member,
+        error:memberError
     } =
         await supabaseClient
             .from("conversation_members")
-            .select(`
-                user_id,
-                profiles (
-                    id,
-                    name,
-                    kallimni_number,
-                    avatar_url
-                )
-            `)
+            .select("user_id")
             .eq(
                 "conversation_id",
                 conversationId
@@ -3490,17 +3487,55 @@ async function getConversationOtherUser(
             .limit(1)
             .maybeSingle();
 
-    if(error){
+    if(memberError){
 
         console.error(
-            "GET OTHER USER:",
-            error
+            "GET OTHER USER MEMBER:",
+            memberError
         );
 
         return null;
     }
 
-    return data?.profiles || null;
+    if(!member?.user_id){
+        return null;
+    }
+
+    if(profileCache.has(member.user_id)){
+        return profileCache.get(member.user_id);
+    }
+
+    const {
+        data:profile,
+        error:profileError
+    } =
+        await supabaseClient
+            .from("profiles")
+            .select("id,name,kallimni_number,avatar_url")
+            .eq(
+                "id",
+                member.user_id
+            )
+            .maybeSingle();
+
+    if(profileError){
+
+        console.error(
+            "GET OTHER USER PROFILE:",
+            profileError
+        );
+
+        return null;
+    }
+
+    if(profile){
+        profileCache.set(
+            profile.id,
+            profile
+        );
+    }
+
+    return profile || null;
 }
 
 
@@ -3517,30 +3552,27 @@ async function loadConversations(){
     const container =
         $("conversations");
 
+    /*
+     * الخطوة الأولى: نجيب conversation_id فقط من
+     * conversation_members بدون أي nested relationship.
+     */
     const {
-        data,
-        error
+        data:members,
+        error:membersError
     } =
         await supabaseClient
             .from("conversation_members")
-            .select(`
-                conversation_id,
-                conversations (
-                    id,
-                    created_at,
-                    updated_at
-                )
-            `)
+            .select("conversation_id")
             .eq(
                 "user_id",
                 currentUser.id
             );
 
-    if(error){
+    if(membersError){
 
         console.error(
-            "LOAD CONVERSATIONS:",
-            error
+            "LOAD CONVERSATIONS MEMBERS:",
+            membersError
         );
 
         container.innerHTML =
@@ -3554,9 +3586,94 @@ async function loadConversations(){
     }
 
     if(
-        !data ||
-        data.length === 0
+        !members ||
+        members.length === 0
     ){
+
+        container.innerHTML =
+            `
+            <div class="empty-list">
+                لا توجد محادثات حتى الآن.
+                <br>
+                اضغط على «محادثة جديدة» للبدء.
+            </div>
+            `;
+
+        return;
+    }
+
+    const conversationIds =
+        [...new Set(
+            members
+                .map(item=>item.conversation_id)
+                .filter(Boolean)
+        )];
+
+    if(conversationIds.length === 0){
+
+        container.innerHTML =
+            `
+            <div class="empty-list">
+                لا توجد محادثات حتى الآن.
+                <br>
+                اضغط على «محادثة جديدة» للبدء.
+            </div>
+            `;
+
+        return;
+    }
+
+    /*
+     * الخطوة الثانية: نجيب بيانات المحادثات بشكل منفصل.
+     */
+    const {
+        data:conversationsData,
+        error:conversationsError
+    } =
+        await supabaseClient
+            .from("conversations")
+            .select("id,created_at,updated_at")
+            .in(
+                "id",
+                conversationIds
+            );
+
+    if(conversationsError){
+
+        console.error(
+            "LOAD CONVERSATIONS DATA:",
+            conversationsError
+        );
+
+        container.innerHTML =
+            `
+            <div class="empty-list">
+                حصل خطأ في تحميل المحادثات.
+            </div>
+            `;
+
+        return;
+    }
+
+    const conversationsMap =
+        new Map(
+            (conversationsData || [])
+                .map(conversation=>[
+                    conversation.id,
+                    conversation
+                ])
+        );
+
+    const data =
+        conversationIds
+            .map(id=>({
+                conversation_id:id,
+                conversation:
+                    conversationsMap.get(id) || null
+            }))
+            .filter(item=>item.conversation);
+
+    if(data.length === 0){
 
         container.innerHTML =
             `
@@ -3575,21 +3692,20 @@ async function loadConversations(){
     /*
      * الأحدث أولًا
      */
-
     data.sort(
         (a,b)=>{
 
             const da =
                 new Date(
-                    a.conversations?.updated_at ||
-                    a.conversations?.created_at ||
+                    a.conversation?.updated_at ||
+                    a.conversation?.created_at ||
                     0
                 );
 
             const db =
                 new Date(
-                    b.conversations?.updated_at ||
-                    b.conversations?.created_at ||
+                    b.conversation?.updated_at ||
+                    b.conversation?.created_at ||
                     0
                 );
 
@@ -3597,13 +3713,12 @@ async function loadConversations(){
         }
     );
 
-
     for(
         const item of data
     ){
 
         const conversation =
-            item.conversations;
+            item.conversation;
 
         if(!conversation){
             continue;
@@ -3651,7 +3766,6 @@ async function loadConversations(){
         last =
             lastData;
 
-
         if(last){
 
             if(
@@ -3675,7 +3789,6 @@ async function loadConversations(){
             }
         }
 
-
         const div =
             document.createElement(
                 "div"
@@ -3688,7 +3801,6 @@ async function loadConversations(){
             currentConversation?.id ===
             conversation.id
         ){
-
             div.classList.add(
                 "active"
             );
@@ -3696,7 +3808,6 @@ async function loadConversations(){
 
         div.dataset.id =
             conversation.id;
-
 
         div.innerHTML = `
 
@@ -3739,7 +3850,6 @@ async function loadConversations(){
 
         `;
 
-
         div.onclick =
             ()=>{
                 openConversation(
@@ -3747,7 +3857,6 @@ async function loadConversations(){
                     profile
                 );
             };
-
 
         container.appendChild(
             div
@@ -3795,19 +3904,55 @@ async function openChatByNumber(
         );
     }
 
-
+    /*
+     * نبحث عن المستخدم بالـKallimni number أولًا.
+     * لا نرسل p_number إلى الـRPC لأن هناك نسختين
+     * من open_or_create_chat بنفس الاسم، وهذا يسبب PGRST202.
+     */
     const {
-        data,
+        data:profile,
+        error:profileError
+    } =
+        await supabaseClient
+            .from("profiles")
+            .select("id,name,kallimni_number,avatar_url")
+            .eq(
+                "kallimni_number",
+                number
+            )
+            .maybeSingle();
+
+    if(profileError){
+
+        console.error(
+            "FIND PROFILE BY NUMBER:",
+            profileError
+        );
+
+        throw profileError;
+    }
+
+    if(!profile){
+
+        throw new Error(
+            "USER_NOT_FOUND"
+        );
+    }
+
+    /*
+     * الـRPC ترجع UUID مباشرة، وليس object.
+     */
+    const {
+        data:conversationId,
         error
     } =
         await supabaseClient.rpc(
             "open_or_create_chat",
             {
-                p_number:
-                    number
+                p_other_user_id:
+                    profile.id
             }
         );
-
 
     if(error){
 
@@ -3819,46 +3964,21 @@ async function openChatByNumber(
         throw error;
     }
 
-
-    if(
-        !data ||
-        !data.conversation_id ||
-        !data.profile
-    ){
+    if(!conversationId){
 
         throw new Error(
             "INVALID_RPC_RESPONSE"
         );
     }
 
-
-    const profile = {
-
-        id:
-            data.profile.id,
-
-        name:
-            data.profile.name,
-
-        kallimni_number:
-            data.profile.kallimni_number,
-
-        avatar_url:
-            data.profile.avatar_url
-    };
-
-
     profileCache.set(
         profile.id,
         profile
     );
 
-
     return {
 
-        conversationId:
-            data.conversation_id,
-
+        conversationId,
         profile
     };
 }
