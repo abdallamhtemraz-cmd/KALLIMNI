@@ -707,6 +707,7 @@ button{
 .conversations{
 
     flex:1;
+    min-height:0;
 
     overflow-y:auto;
 }
@@ -816,6 +817,17 @@ button{
     text-overflow:ellipsis;
 }
 
+
+.unread-badge{
+    min-width:22px; height:22px; padding:0 6px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:999px; background:#25d366; color:#06140a;
+    font-size:10px; font-weight:900; flex-shrink:0;
+}
+.messages::-webkit-scrollbar,.conversations::-webkit-scrollbar{width:8px}
+.messages::-webkit-scrollbar-thumb,.conversations::-webkit-scrollbar-thumb{background:#2b313b;border-radius:99px}
+.messages::-webkit-scrollbar-track,.conversations::-webkit-scrollbar-track{background:transparent}
+
 /* =====================================================
    CHAT
 ===================================================== */
@@ -823,6 +835,8 @@ button{
 .chat{
 
     direction:rtl;
+    min-height:0;
+    overflow:hidden;
 
     min-width:0;
 
@@ -1000,6 +1014,8 @@ button{
 .messages{
 
     flex:1;
+    min-height:0;
+    height:0;
 
     overflow-y:auto;
 
@@ -2679,6 +2695,10 @@ let typingStopTimer = null;
 let isTypingBroadcasting = false;
 let notificationsReady = false;
 let unreadCount = 0;
+let unreadByConversation = {};
+let conversationsLoadPromise = null;
+const UNREAD_KEY = "kallimni_unread_v2";
+try{ unreadByConversation = JSON.parse(localStorage.getItem(UNREAD_KEY)||"{}"); }catch(e){ unreadByConversation = {}; }
 let originalDocumentTitle = document.title;
 
 let isBlocked = false;
@@ -2987,22 +3007,38 @@ function compressImage(
 ========================================================= */
 
 async function requestNotificationPermission(){
-    if(!('Notification' in window)) return;
-    if(Notification.permission === 'granted'){ notificationsReady=true; return; }
-    if(Notification.permission === 'default'){
-        try{ notificationsReady = (await Notification.requestPermission()) === 'granted'; }
-        catch(error){ console.warn('NOTIFICATION PERMISSION:',error); }
-    }
+    if(!('Notification' in window)) return false;
+    if(Notification.permission === 'granted'){ notificationsReady=true; return true; }
+    if(Notification.permission === 'denied') return false;
+    try{
+        const result=await Notification.requestPermission();
+        notificationsReady=result==='granted';
+        return notificationsReady;
+    }catch(error){ console.warn('NOTIFICATION PERMISSION:',error); return false; }
 }
 
-function markNotificationsRead(){ unreadCount=0; document.title=originalDocumentTitle; }
+function saveUnreadState(){
+    try{ localStorage.setItem(UNREAD_KEY,JSON.stringify(unreadByConversation)); }catch(e){}
+}
+function recalcUnread(){
+    unreadCount=Object.values(unreadByConversation).reduce((a,b)=>a+(Number(b)||0),0);
+    document.title=unreadCount>0?`(${unreadCount}) رسالة جديدة • كلّمني`:originalDocumentTitle;
+}
+function markNotificationsRead(conversationId){
+    if(conversationId){ delete unreadByConversation[conversationId]; saveUnreadState(); }
+    else { unreadByConversation={}; saveUnreadState(); }
+    recalcUnread();
+}
+function addUnread(conversationId,count=1){
+    unreadByConversation[conversationId]=(Number(unreadByConversation[conversationId])||0)+count;
+    saveUnreadState(); recalcUnread();
+}
 
 function notifyIncomingMessage(message,profile){
     if(!message || message.sender_id===currentUser?.id) return;
     const same=currentConversation?.id===message.conversation_id;
     if(same && document.visibilityState==='visible') return;
-    unreadCount++;
-    document.title=`(${unreadCount}) رسالة جديدة • كلّمني`;
+    addUnread(message.conversation_id,1);
     const name=profile?.name||'رسالة جديدة';
     let body='رسالة جديدة';
     if(message.message_type==='image') body='🖼 أرسل لك صورة';
@@ -3011,7 +3047,7 @@ function notifyIncomingMessage(message,profile){
     showToast(`💬 ${name}: ${body}`);
     if('Notification' in window && Notification.permission==='granted'){
         try{
-            const n=new Notification(name,{body,icon:getAvatar(profile?.avatar_url),tag:`kallimni-${message.conversation_id}`});
+            const n=new Notification(name,{body,icon:getAvatar(profile?.avatar_url),tag:`kallimni-${message.conversation_id}-${message.id}`});
             n.onclick=()=>{window.focus();n.close();};
         }catch(error){ console.warn('NOTIFICATION:',error); }
     }
@@ -3641,326 +3677,43 @@ async function getConversationOtherUser(
 ========================================================= */
 
 async function loadConversations(){
-
-    if(!currentUser){
-        return;
-    }
-
-    const container =
-        $("conversations");
-
-    /*
-     * الخطوة الأولى: نجيب conversation_id فقط من
-     * conversation_members بدون أي nested relationship.
-     */
-    const {
-        data:members,
-        error:membersError
-    } =
-        await supabaseClient
-            .from("conversation_members")
-            .select("conversation_id")
-            .eq(
-                "user_id",
-                currentUser.id
-            );
-
-    if(membersError){
-
-        console.error(
-            "LOAD CONVERSATIONS MEMBERS:",
-            membersError
-        );
-
-        container.innerHTML =
-            `
-            <div class="empty-list">
-                حصل خطأ في تحميل المحادثات.
-            </div>
-            `;
-
-        return;
-    }
-
-    if(
-        !members ||
-        members.length === 0
-    ){
-
-        container.innerHTML =
-            `
-            <div class="empty-list">
-                لا توجد محادثات حتى الآن.
-                <br>
-                اضغط على «محادثة جديدة» للبدء.
-            </div>
-            `;
-
-        return;
-    }
-
-    const conversationIds =
-        [...new Set(
-            members
-                .map(item=>item.conversation_id)
-                .filter(Boolean)
-        )];
-
-    if(conversationIds.length === 0){
-
-        container.innerHTML =
-            `
-            <div class="empty-list">
-                لا توجد محادثات حتى الآن.
-                <br>
-                اضغط على «محادثة جديدة» للبدء.
-            </div>
-            `;
-
-        return;
-    }
-
-    /*
-     * الخطوة الثانية: نجيب بيانات المحادثات بشكل منفصل.
-     */
-    const {
-        data:conversationsData,
-        error:conversationsError
-    } =
-        await supabaseClient
-            .from("conversations")
-            .select("id,created_at,updated_at")
-            .in(
-                "id",
-                conversationIds
-            );
-
-    if(conversationsError){
-
-        console.error(
-            "LOAD CONVERSATIONS DATA:",
-            conversationsError
-        );
-
-        container.innerHTML =
-            `
-            <div class="empty-list">
-                حصل خطأ في تحميل المحادثات.
-            </div>
-            `;
-
-        return;
-    }
-
-    const conversationsMap =
-        new Map(
-            (conversationsData || [])
-                .map(conversation=>[
-                    conversation.id,
-                    conversation
-                ])
-        );
-
-    const data =
-        conversationIds
-            .map(id=>({
-                conversation_id:id,
-                conversation:
-                    conversationsMap.get(id) || null
-            }))
-            .filter(item=>item.conversation);
-
-    if(data.length === 0){
-
-        container.innerHTML =
-            `
-            <div class="empty-list">
-                لا توجد محادثات حتى الآن.
-                <br>
-                اضغط على «محادثة جديدة» للبدء.
-            </div>
-            `;
-
-        return;
-    }
-
-    container.innerHTML = "";
-
-    /*
-     * الأحدث أولًا
-     */
-    data.sort(
-        (a,b)=>{
-
-            const da =
-                new Date(
-                    a.conversation?.updated_at ||
-                    a.conversation?.created_at ||
-                    0
-                );
-
-            const db =
-                new Date(
-                    b.conversation?.updated_at ||
-                    b.conversation?.created_at ||
-                    0
-                );
-
-            return db - da;
-        }
-    );
-
-    for(
-        const item of data
-    ){
-
-        const conversation =
-            item.conversation;
-
-        if(!conversation){
-            continue;
-        }
-
-        const profile =
-            await getConversationOtherUser(
-                conversation.id
-            );
-
-        if(!profile){
-            continue;
-        }
-
-        profileCache.set(
-            profile.id,
-            profile
-        );
-
-        let lastMessage = "";
-
-        let last = null;
-
-        const {
-            data:lastData
-        } =
-            await supabaseClient
-                .from("messages")
-                .select(
-                    "text,message_type,created_at"
-                )
-                .eq(
-                    "conversation_id",
-                    conversation.id
-                )
-                .order(
-                    "created_at",
-                    {
-                        ascending:false
-                    }
-                )
-                .limit(1)
-                .maybeSingle();
-
-        last =
-            lastData;
-
-        if(last){
-
-            if(
-                last.message_type === "image"
-            ){
-
-                lastMessage =
-                    "🖼 صورة";
-
-            }else if(
-                last.message_type === "voice"
-            ){
-
-                lastMessage =
-                    "🎙 رسالة صوتية";
-
-            }else{
-
-                lastMessage =
-                    last.text || "";
+    if(!currentUser) return;
+    if(conversationsLoadPromise) return conversationsLoadPromise;
+    conversationsLoadPromise=(async()=>{
+        const container=$('conversations');
+        const {data:members,error:membersError}=await supabaseClient.from('conversation_members').select('conversation_id').eq('user_id',currentUser.id);
+        if(membersError){ console.error('LOAD CONVERSATIONS MEMBERS:',membersError); return; }
+        const ids=[...new Set((members||[]).map(x=>x.conversation_id).filter(Boolean))];
+        if(!ids.length){ container.innerHTML='<div class="empty-list">لا توجد محادثات حتى الآن.<br>اضغط على «محادثة جديدة» للبدء.</div>'; return; }
+        const {data:conversationsData,error:convError}=await supabaseClient.from('conversations').select('id,created_at,updated_at').in('id',ids);
+        if(convError){ console.error('LOAD CONVERSATIONS DATA:',convError); return; }
+        const rows=(conversationsData||[]).slice().sort((a,b)=>new Date(b.updated_at||b.created_at||0)-new Date(a.updated_at||a.created_at||0));
+        const fragment=document.createDocumentFragment();
+        const seen=new Set();
+        for(const conversation of rows){
+            if(seen.has(conversation.id)) continue; seen.add(conversation.id);
+            const profile=await getConversationOtherUser(conversation.id); if(!profile) continue;
+            profileCache.set(profile.id,profile);
+            const {data:last}=await supabaseClient.from('messages').select('id,text,message_type,created_at,sender_id').eq('conversation_id',conversation.id).order('created_at',{ascending:false}).limit(1).maybeSingle();
+            let lastMessage='';
+            if(last){ lastMessage=last.message_type==='image'?'🖼 صورة':last.message_type==='voice'?'🎙 رسالة صوتية':(last.text||''); }
+            // Recover unread count after refresh from messages newer than the saved seen timestamp.
+            const seenAt=localStorage.getItem(`kallimni_seen_${conversation.id}`)||'';
+            if(seenAt){
+                const {data:unseen}=await supabaseClient.from('messages').select('id').eq('conversation_id',conversation.id).neq('sender_id',currentUser.id).gt('created_at',seenAt).limit(100);
+                if(unseen && unseen.length) unreadByConversation[conversation.id]=unseen.length;
             }
+            const div=document.createElement('div'); div.className='conversation-item'; div.dataset.id=conversation.id;
+            if(currentConversation?.id===conversation.id) div.classList.add('active');
+            const count=Number(unreadByConversation[conversation.id]||0);
+            div.innerHTML=`<img src="${escapeHTML(getAvatar(profile.avatar_url))}" alt=""><div class="conv-content"><div class="conv-top"><div class="conv-name">${escapeHTML(profile.name)}</div><div class="conv-time">${last?formatConversationTime(last.created_at):''}</div></div><div class="conv-last">${escapeHTML(lastMessage)}</div></div>${count?`<span class="unread-badge">${count>99?'99+':count}</span>`:''}`;
+            div.onclick=async()=>{ markNotificationsRead(conversation.id); localStorage.setItem(`kallimni_seen_${conversation.id}`,new Date().toISOString()); await openConversation(conversation.id,profile); };
+            fragment.appendChild(div);
         }
-
-        const div =
-            document.createElement(
-                "div"
-            );
-
-        div.className =
-            "conversation-item";
-
-        if(
-            currentConversation?.id ===
-            conversation.id
-        ){
-            div.classList.add(
-                "active"
-            );
-        }
-
-        div.dataset.id =
-            conversation.id;
-
-        div.innerHTML = `
-
-            <img
-                src="${escapeHTML(
-                    getAvatar(
-                        profile.avatar_url
-                    )
-                )}"
-                alt=""
-            >
-
-            <div class="conv-content">
-
-                <div class="conv-top">
-
-                    <div class="conv-name">
-                        ${escapeHTML(
-                            profile.name
-                        )}
-                    </div>
-
-                    <div class="conv-time">
-                        ${
-                            last
-                                ? formatConversationTime(
-                                    last.created_at
-                                  )
-                                : ""
-                        }
-                    </div>
-
-                </div>
-
-                <div class="conv-last">
-                    ${escapeHTML(lastMessage)}
-                </div>
-
-            </div>
-
-        `;
-
-        div.onclick =
-            ()=>{
-                openConversation(
-                    conversation.id,
-                    profile
-                );
-            };
-
-        container.appendChild(
-            div
-        );
-    }
+        container.innerHTML=''; container.appendChild(fragment); saveUnreadState(); recalcUnread();
+    })().finally(()=>{conversationsLoadPromise=null;});
+    return conversationsLoadPromise;
 }
-
 
 /* =========================================================
    OPEN / CREATE CONVERSATION
@@ -4503,7 +4256,8 @@ async function openConversation(
     await checkBlockStatus();
 
 
-    markNotificationsRead();
+    markNotificationsRead(conversationId);
+    localStorage.setItem(`kallimni_seen_${conversationId}`,new Date().toISOString());
     setTypingVisible(false);
     isTypingBroadcasting=false;
 
@@ -6112,22 +5866,26 @@ function subscribeOtherProfile(){
    REALTIME CONVERSATIONS
 ========================================================= */
 
+let conversationReloadTimer=null;
+function scheduleConversationReload(){
+    clearTimeout(conversationReloadTimer);
+    conversationReloadTimer=setTimeout(()=>loadConversations(),250);
+}
 function subscribeConversations(){
     if(conversationChannel){supabaseClient.removeChannel(conversationChannel);conversationChannel=null;}
     conversationChannel=supabaseClient.channel(`user-conversations-${currentUser.id}`)
-        .on('postgres_changes',{event:'*',schema:'public',table:'conversation_members',filter:`user_id=eq.${currentUser.id}`},async()=>loadConversations())
-        .on('postgres_changes',{event:'UPDATE',schema:'public',table:'conversations'},async()=>loadConversations())
+        .on('postgres_changes',{event:'INSERT',schema:'public',table:'conversation_members',filter:`user_id=eq.${currentUser.id}`},scheduleConversationReload)
+        .on('postgres_changes',{event:'UPDATE',schema:'public',table:'conversations'},scheduleConversationReload)
         .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},async payload=>{
             if(payload.new.sender_id!==currentUser.id){
                 const profile=await getConversationOtherUser(payload.new.conversation_id);
-                if(profile)notifyIncomingMessage(payload.new,profile);
+                if(profile) notifyIncomingMessage(payload.new,profile);
             }
-            await loadConversations();
+            scheduleConversationReload();
         })
-        .on('postgres_changes',{event:'DELETE',schema:'public',table:'messages'},async()=>loadConversations())
+        .on('postgres_changes',{event:'DELETE',schema:'public',table:'messages'},scheduleConversationReload)
         .subscribe(status=>console.log('CONVERSATION CHANNEL:',status));
 }
-
 
 /* =========================================================
    SETTINGS
@@ -6290,11 +6048,7 @@ $("settingsForm").addEventListener(
                         name,
 
                         avatar_url:
-                            avatarUrl,
-
-                        updated_at:
-                            new Date()
-                                .toISOString()
+                            avatarUrl
                     })
                     .eq(
                         "id",
@@ -6583,9 +6337,8 @@ function scrollMessages(){
 }
 
 
-document.addEventListener('click',()=>{
-    if(!notificationsReady)requestNotificationPermission();
-},{passive:true});
+document.addEventListener('click',()=>{ if(!notificationsReady)requestNotificationPermission(); },{passive:true});
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible' && currentConversation){ markNotificationsRead(currentConversation.id); localStorage.setItem(`kallimni_seen_${currentConversation.id}`,new Date().toISOString()); loadConversations(); } });
 
 /* =========================================================
    AUTH SESSION
